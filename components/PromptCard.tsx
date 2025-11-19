@@ -95,30 +95,9 @@ export function PromptCard({ card }: PromptCardProps) {
             {/* 헤더 */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold mb-2 line-clamp-2 text-card-foreground">
+                <h3 className="text-base font-semibold mb-1 line-clamp-2 text-card-foreground">
                   {card.title}
                 </h3>
-                {/* Before/After 도구 배지 */}
-                <div className="flex flex-wrap gap-2">
-                  {card.beforeItems.length > 0 && card.beforeItems[0].tool && (
-                    <>
-                      {card.beforeItems[0].tool.split('/').map((tool, idx) => (
-                        <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
-                          Before: {tool.trim()}
-                        </span>
-                      ))}
-                    </>
-                  )}
-                  {card.afterItems.length > 0 && card.afterItems[0].tool && (
-                    <>
-                      {card.afterItems[0].tool.split('/').map((tool, idx) => (
-                        <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800">
-                          After: {tool.trim()}
-                        </span>
-                      ))}
-                    </>
-                  )}
-                </div>
               </div>
               <TooltipProvider>
                 <Tooltip>
@@ -148,7 +127,7 @@ export function PromptCard({ card }: PromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                               {tool.trim()}
                             </span>
                           ))}
@@ -214,7 +193,7 @@ export function PromptCard({ card }: PromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800">
+                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                               {tool.trim()}
                             </span>
                           ))}
