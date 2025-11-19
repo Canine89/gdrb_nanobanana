@@ -205,7 +205,7 @@ export default function Home() {
                     ★ 클릭 몇 번으로 이렇게 달라진다고!
                   </p>
                   <p className="text-xs font-medium text-foreground leading-tight">
-                    ★ 나노바나나를 200% 활용하는 '쌩초'의 비포/애프터 레시피 대방출!
+                    ★ 나노바나나를 200% 활용하는 &apos;쌩초&apos;의 비포/애프터 레시피 대방출!
                   </p>
                   <p className="text-xs font-medium text-foreground leading-tight">
                     ★ 포토샵 없이, 스튜디오 촬영 없이 만드는 71가지 고퀄리티 사진

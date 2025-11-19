@@ -1,13 +1,22 @@
 import { google } from 'googleapis';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 const SPREADSHEET_ID = '1PI1MR0w4c6jM6_8-ReI1i_73BemdcPHrJuYY8oj0Uyo';
 const SHEET_NAME = '나노바나나 AI 비포&애프터 미친 활용법 71제 슈퍼 프롬프트 복붙 시트';
 
 export async function getGoogleSheetsClient() {
-  const serviceAccountPath = join(process.cwd(), 'service-account-file.json');
-  const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf-8'));
+  // 환경 변수에서 서비스 계정 정보 가져오기
+  const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  
+  if (!serviceAccountJson) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON environment variable is not set');
+  }
+
+  let serviceAccount;
+  try {
+    serviceAccount = JSON.parse(serviceAccountJson);
+  } catch (error) {
+    throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Make sure it is valid JSON.');
+  }
 
   const auth = new google.auth.GoogleAuth({
     credentials: serviceAccount,
