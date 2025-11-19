@@ -33,6 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       } else {
         // 사용자가 없으면 익명 인증 시도
+        if (!auth) {
+          setLoading(false);
+          return;
+        }
+        
         try {
           const userCredential = await signInAnonymously(auth);
           setUser(userCredential.user);
