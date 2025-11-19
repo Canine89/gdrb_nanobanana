@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Masonry from 'react-masonry-css';
 import { PromptTable } from '@/components/PromptTable';
 import { PromptCard } from '@/components/PromptCard';
+import { SpecialPromptCard } from '@/components/SpecialPromptCard';
+import { RedeemCodeModal } from '@/components/RedeemCodeModal';
 import { Pagination } from '@/components/Pagination';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,14 +18,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { usePromptData } from '@/hooks/usePromptData';
-import { Search } from 'lucide-react';
+import { useSpecialPromptData } from '@/hooks/useSpecialPromptData';
+import { Search, Gift } from 'lucide-react';
 import type { PromptCard as PromptCardType } from '@/types';
 
 export default function Home() {
   const { promptCards, loading, error } = usePromptData();
+  const { promptCards: specialCards, loading: specialLoading, error: specialError } = useSpecialPromptData();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [redeemCodeModalOpen, setRedeemCodeModalOpen] = useState(false);
+  const [isRedeemCodeActivated, setIsRedeemCodeActivated] = useState(false);
   
   // 검색 필터링
   const filteredCards = useMemo(() => {
@@ -86,8 +92,63 @@ export default function Home() {
     setCurrentPage(1);
   };
   
+  // 리딤코드 활성화 상태 확인
+  useEffect(() => {
+    const checkRedeemCode = () => {
+      const activated = localStorage.getItem('redeemCodeActivated') === 'true';
+      setIsRedeemCodeActivated(activated);
+    };
+    
+    checkRedeemCode();
+    // storage 이벤트 리스너 추가 (다른 탭에서 변경 시 반영)
+    window.addEventListener('storage', checkRedeemCode);
+    
+    return () => {
+      window.removeEventListener('storage', checkRedeemCode);
+    };
+  }, []);
+
+  const handleRedeemSuccess = () => {
+    setIsRedeemCodeActivated(true);
+    // 페이지 새로고침하여 스페셜 프롬프트 데이터 로드
+    window.location.reload();
+  };
+
   const cardCount = promptCards.length;
   const formattedCount = cardCount.toString().padStart(2, '0');
+
+  // 스페셜 프롬프트 검색 필터링
+  const filteredSpecialCards = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return specialCards;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return specialCards.filter((card: PromptCardType) => {
+      const title = card.title?.toLowerCase() || '';
+      
+      const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
+        ? card.beforeItems[0].tool.toLowerCase()
+        : '';
+      
+      const beforeMatches = card.beforeItems.some(item => 
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+      
+      const afterMatches = card.afterItems.some(item => 
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+      
+      return (
+        title.includes(query) ||
+        tool.includes(query) ||
+        beforeMatches ||
+        afterMatches
+      );
+    });
+  }, [specialCards, searchQuery]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -111,17 +172,30 @@ export default function Home() {
               </h1>
             </div>
             
-            {/* 검색 입력 */}
-            <div className="flex-shrink-0 w-64">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="프롬프트 검색..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-10"
-                />
+            {/* 검색 입력 및 리딤코드 버튼 */}
+            <div className="flex-shrink-0 flex items-center gap-2">
+              {!isRedeemCodeActivated && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setRedeemCodeModalOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Gift className="h-4 w-4" />
+                  리딤코드
+                </Button>
+              )}
+              <div className="w-64">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="프롬프트 검색..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -143,6 +217,63 @@ export default function Home() {
         {error && (
           <div className="mb-6 p-4 rounded-lg border border-destructive/50 bg-destructive/5 text-destructive text-sm">
             {error}
+          </div>
+        )}
+
+        {/* 스페셜 프롬프트 섹션 */}
+        {isRedeemCodeActivated && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-2xl font-bold text-foreground font-noto-sans-kr">
+                스페셜 프롬프트
+              </h2>
+              <div className="flex-1 h-px bg-border"></div>
+            </div>
+
+            {specialError && (
+              <div className="mb-6 p-4 rounded-lg border border-destructive/50 bg-destructive/5 text-destructive text-sm">
+                {specialError}
+              </div>
+            )}
+
+            {specialLoading ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">스페셜 프롬프트를 불러오는 중...</p>
+              </div>
+            ) : filteredSpecialCards.length > 0 ? (
+              <Masonry
+                breakpointCols={{
+                  default: 3,
+                  1024: 3,
+                  768: 2,
+                  640: 1,
+                }}
+                className="flex -ml-4 w-auto"
+                columnClassName="pl-4 bg-clip-padding"
+              >
+                {filteredSpecialCards.map((card) => (
+                  <div key={card.id} className="mb-4">
+                    <SpecialPromptCard card={card} />
+                  </div>
+                ))}
+              </Masonry>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">스페셜 프롬프트가 없습니다.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 일반 프롬프트 섹션 */}
+        {isRedeemCodeActivated && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-2xl font-bold text-foreground font-noto-sans-kr">
+                일반 프롬프트
+              </h2>
+              <div className="flex-1 h-px bg-border"></div>
+            </div>
           </div>
         )}
 
@@ -233,6 +364,13 @@ export default function Home() {
             ))}
           </Masonry>
         )}
+
+        {/* 리딤코드 모달 */}
+        <RedeemCodeModal
+          open={redeemCodeModalOpen}
+          onOpenChange={setRedeemCodeModalOpen}
+          onRedeemSuccess={handleRedeemSuccess}
+        />
       </div>
     </main>
   );

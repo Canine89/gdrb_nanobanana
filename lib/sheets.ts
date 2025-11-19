@@ -83,3 +83,60 @@ export async function getSheetData() {
   }
 }
 
+export async function getSpecialSheetData() {
+  try {
+    const sheets = await getGoogleSheetsClient();
+    
+    // 시트 목록을 가져와서 gid로 특정 시트 찾기
+    const spreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId: SPREADSHEET_ID,
+    });
+
+    // gid=1059416357인 시트 찾기 (sheetId는 gid와 동일)
+    const targetSheetId = 1059416357;
+    const sheet = spreadsheetInfo.data.sheets?.find(
+      s => s.properties?.sheetId === targetSheetId
+    );
+
+    if (!sheet || !sheet.properties?.title) {
+      throw new Error('Special sheet not found');
+    }
+
+    const actualSheetName = sheet.properties.title;
+    
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: actualSheetName,
+    });
+
+    return {
+      values: response.data.values || [],
+      range: response.data.range || '',
+    };
+  } catch (error: any) {
+    console.error('Error fetching special sheet data:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      response: error.response?.data,
+    });
+    
+    // 더 자세한 에러 메시지 제공
+    if (error.code === 'ENOENT') {
+      throw new Error('Service account file not found');
+    } else if (error.code === 403 || error.response?.status === 403) {
+      throw new Error('Permission denied. Please check if the service account has access to the spreadsheet.');
+    } else if (error.code === 404 || error.response?.status === 404) {
+      throw new Error(`Spreadsheet not found. Please check the spreadsheet ID: ${SPREADSHEET_ID}`);
+    }
+    
+    // Google API 에러 처리
+    if (error.response?.data?.error) {
+      const apiError = error.response.data.error;
+      throw new Error(`Google API Error: ${apiError.message || JSON.stringify(apiError)}`);
+    }
+    
+    throw error;
+  }
+}
+
