@@ -14,6 +14,11 @@ const notoSansKR = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "나노바나나 AI 프롬프트",
   description: "나노바나나 AI 비포&애프터 미친 활용법 71제 슈퍼 프롬프트 복붙 시트",
+  icons: {
+    icon: [
+      { url: '/icon.png', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
