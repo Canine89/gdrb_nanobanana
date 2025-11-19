@@ -66,19 +66,59 @@ export default function Home() {
       );
     });
   }, [promptCards, searchQuery]);
+
+  // 스페셜 프롬프트 검색 필터링
+  const filteredSpecialCards = useMemo(() => {
+    if (!isRedeemCodeActivated) return [];
+    
+    if (!searchQuery.trim()) {
+      return specialCards;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return specialCards.filter((card: PromptCardType) => {
+      const title = card.title?.toLowerCase() || '';
+      
+      const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
+        ? card.beforeItems[0].tool.toLowerCase()
+        : '';
+      
+      const beforeMatches = card.beforeItems.some(item => 
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+      
+      const afterMatches = card.afterItems.some(item => 
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+      
+      return (
+        title.includes(query) ||
+        tool.includes(query) ||
+        beforeMatches ||
+        afterMatches
+      );
+    });
+  }, [specialCards, searchQuery, isRedeemCodeActivated]);
+
+  // 통합된 카드 배열 (스페셜 프롬프트가 앞에 배치)
+  const allFilteredCards = useMemo(() => {
+    return [...filteredSpecialCards, ...filteredCards];
+  }, [filteredSpecialCards, filteredCards]);
   
   // 페이지네이션 (첫 페이지에 표지가 있으므로 카드는 itemsPerPage - 1개, 나머지는 itemsPerPage개)
-  const totalPages = Math.ceil((filteredCards.length + 1) / itemsPerPage); // 표지 포함
+  const totalPages = Math.ceil((allFilteredCards.length + 1) / itemsPerPage); // 표지 포함
   const paginatedCards = useMemo(() => {
     if (currentPage === 1) {
       // 첫 페이지: 표지 1개 + 카드 (itemsPerPage - 1)개
-      return filteredCards.slice(0, itemsPerPage - 1);
+      return allFilteredCards.slice(0, itemsPerPage - 1);
     } else {
       // 나머지 페이지: 카드 itemsPerPage개 (표지 제외하고 계산)
       const startIndex = (currentPage - 1) * itemsPerPage - 1; // 첫 페이지의 표지 자리 제외
-      return filteredCards.slice(startIndex, startIndex + itemsPerPage);
+      return allFilteredCards.slice(startIndex, startIndex + itemsPerPage);
     }
-  }, [filteredCards, currentPage, itemsPerPage]);
+  }, [allFilteredCards, currentPage, itemsPerPage]);
   
   // 검색어 변경 시 첫 페이지로 이동
   const handleSearchChange = (value: string) => {
@@ -116,39 +156,6 @@ export default function Home() {
 
   const cardCount = promptCards.length;
   const formattedCount = cardCount.toString().padStart(2, '0');
-
-  // 스페셜 프롬프트 검색 필터링
-  const filteredSpecialCards = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return specialCards;
-    }
-    
-    const query = searchQuery.toLowerCase();
-    return specialCards.filter((card: PromptCardType) => {
-      const title = card.title?.toLowerCase() || '';
-      
-      const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
-        ? card.beforeItems[0].tool.toLowerCase()
-        : '';
-      
-      const beforeMatches = card.beforeItems.some(item => 
-        item.english.toLowerCase().includes(query) ||
-        item.korean.toLowerCase().includes(query)
-      );
-      
-      const afterMatches = card.afterItems.some(item => 
-        item.english.toLowerCase().includes(query) ||
-        item.korean.toLowerCase().includes(query)
-      );
-      
-      return (
-        title.includes(query) ||
-        tool.includes(query) ||
-        beforeMatches ||
-        afterMatches
-      );
-    });
-  }, [specialCards, searchQuery]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -209,7 +216,7 @@ export default function Home() {
           
           {searchQuery && (
             <p className="text-sm text-muted-foreground mt-3">
-              {filteredCards.length}개의 결과를 찾았습니다
+              {allFilteredCards.length}개의 결과를 찾았습니다
             </p>
           )}
         </div>
@@ -220,65 +227,14 @@ export default function Home() {
           </div>
         )}
 
-        {/* 스페셜 프롬프트 섹션 */}
-        {isRedeemCodeActivated && (
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-2xl font-bold text-foreground font-noto-sans-kr">
-                스페셜 프롬프트
-              </h2>
-              <div className="flex-1 h-px bg-border"></div>
-            </div>
-
-            {specialError && (
-              <div className="mb-6 p-4 rounded-lg border border-destructive/50 bg-destructive/5 text-destructive text-sm">
-                {specialError}
-              </div>
-            )}
-
-            {specialLoading ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-muted-foreground">스페셜 프롬프트를 불러오는 중...</p>
-              </div>
-            ) : filteredSpecialCards.length > 0 ? (
-              <Masonry
-                breakpointCols={{
-                  default: 3,
-                  1024: 3,
-                  768: 2,
-                  640: 1,
-                }}
-                className="flex -ml-4 w-auto"
-                columnClassName="pl-4 bg-clip-padding"
-              >
-                {filteredSpecialCards.map((card) => (
-                  <div key={card.id} className="mb-4">
-                    <SpecialPromptCard card={card} />
-                  </div>
-                ))}
-              </Masonry>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-sm text-muted-foreground">스페셜 프롬프트가 없습니다.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 일반 프롬프트 섹션 */}
-        {isRedeemCodeActivated && (
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-2xl font-bold text-foreground font-noto-sans-kr">
-                일반 프롬프트
-              </h2>
-              <div className="flex-1 h-px bg-border"></div>
-            </div>
+        {specialError && (
+          <div className="mb-6 p-4 rounded-lg border border-destructive/50 bg-destructive/5 text-destructive text-sm">
+            {specialError}
           </div>
         )}
 
         {/* 페이지당 개수 선택 및 페이지네이션 */}
-        {!loading && filteredCards.length > 0 && (
+        {!loading && allFilteredCards.length > 0 && (
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">페이지당 표시:</span>
@@ -356,12 +312,20 @@ export default function Home() {
               </div>
             )}
             
-            {/* 실제 카드들 */}
-            {paginatedCards.map((card) => (
-              <div key={card.id} className="mb-4">
-                <PromptCard card={card} />
-              </div>
-            ))}
+            {/* 실제 카드들 (스페셜 프롬프트가 앞에 배치) */}
+            {paginatedCards.map((card) => {
+              // 스페셜 프롬프트인지 확인 (ID에 'special-'이 포함되어 있음)
+              const isSpecial = card.id.startsWith('special-');
+              return (
+                <div key={card.id} className="mb-4">
+                  {isSpecial ? (
+                    <SpecialPromptCard card={card} />
+                  ) : (
+                    <PromptCard card={card} />
+                  )}
+                </div>
+              );
+            })}
           </Masonry>
         )}
 

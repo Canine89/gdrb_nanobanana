@@ -8,18 +8,6 @@ const VALID_REDEEM_CODE = 'GDRB2026-banana';
 
 export async function GET(request: NextRequest) {
   try {
-    // 환경 변수 확인
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-      console.error('GOOGLE_SERVICE_ACCOUNT_JSON is not set');
-      return NextResponse.json(
-        { 
-          error: 'Configuration error',
-          message: 'GOOGLE_SERVICE_ACCOUNT_JSON environment variable is not set'
-        },
-        { status: 500 }
-      );
-    }
-
     // 리딤코드 검증 (클라이언트에서도 검증하지만 서버에서도 한 번 더 확인)
     // 실제로는 헤더나 쿼리 파라미터로 받을 수도 있지만, 
     // 클라이언트에서 localStorage로 관리하므로 여기서는 단순히 데이터만 반환

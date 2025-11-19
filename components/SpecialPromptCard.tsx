@@ -86,13 +86,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div className="group relative bg-gradient-to-br from-card to-primary/5 rounded-lg p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col border border-primary/20">
+          <div className="group relative bg-gradient-to-br from-card via-primary/8 to-primary/12 rounded-lg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col border-2 border-primary/40 ring-1 ring-primary/20">
             {/* 헤더 */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="h-3.5 w-3.5 text-primary/60" />
-                  <h3 className="text-base font-semibold line-clamp-2 text-card-foreground">
+                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                  <h3 className="text-base font-semibold line-clamp-2 text-primary shimmer-text">
                     {card.title}
                   </h3>
                 </div>
@@ -100,7 +100,7 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-primary/10 text-primary text-xs font-medium shrink-0 border border-primary/20">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/15 text-primary text-xs font-semibold shrink-0 border border-primary/30 shadow-sm">
                       <span>{getScoreText(clickCount)}</span>
                     </div>
                   </TooltipTrigger>
@@ -125,7 +125,7 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/5 text-muted-foreground border border-primary/10">
+                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/25 shadow-sm">
                               {tool.trim()}
                             </span>
                           ))}
@@ -140,13 +140,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'before-english');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded border border-primary/10 bg-primary/5 text-xs font-mono whitespace-pre-wrap break-words text-foreground">
+                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm">
                             {renderBoldText(item.english)}
                           </div>
                         </div>
@@ -160,13 +160,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'before-korean');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded border border-primary/10 bg-primary/5 text-xs whitespace-pre-wrap break-words text-foreground">
+                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs whitespace-pre-wrap break-words text-foreground shadow-sm">
                             {renderBoldText(item.korean)}
                           </div>
                         </div>
@@ -191,7 +191,7 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/5 text-muted-foreground border border-primary/10">
+                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/25 shadow-sm">
                               {tool.trim()}
                             </span>
                           ))}
@@ -206,13 +206,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'after-english');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded border border-primary/10 bg-primary/5 text-xs font-mono whitespace-pre-wrap break-words text-foreground">
+                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm">
                             {renderBoldText(item.english)}
                           </div>
                         </div>
@@ -226,13 +226,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'after-korean');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded border border-primary/10 bg-primary/5 text-xs whitespace-pre-wrap break-words text-foreground">
+                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs whitespace-pre-wrap break-words text-foreground shadow-sm">
                             {renderBoldText(item.korean)}
                           </div>
                         </div>
@@ -244,13 +244,13 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
             )}
 
             {/* 푸터 */}
-            <div className="pt-4 border-t border-primary/10 flex items-center justify-end mt-4">
+            <div className="pt-4 border-t border-primary/20 flex items-center justify-end mt-4">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setCommentModalOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-primary hover:bg-primary/5"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-primary/10 font-medium"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글

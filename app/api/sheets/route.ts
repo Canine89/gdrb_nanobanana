@@ -6,18 +6,6 @@ export const revalidate = 60; // 60초마다 재검증
 
 export async function GET() {
   try {
-    // 환경 변수 확인
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-      console.error('GOOGLE_SERVICE_ACCOUNT_JSON is not set');
-      return NextResponse.json(
-        { 
-          error: 'Configuration error',
-          message: 'GOOGLE_SERVICE_ACCOUNT_JSON environment variable is not set'
-        },
-        { status: 500 }
-      );
-    }
-
     const data = await getSheetData();
     return NextResponse.json(data);
   } catch (error) {
