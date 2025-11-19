@@ -58,10 +58,10 @@ export function RedeemCodeModal({ open, onOpenChange, onRedeemSuccess }: RedeemC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-full max-w-md mx-4">
         <DialogHeader>
-          <DialogTitle>리딤코드 입력</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">리딤코드 입력</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">
             스페셜 프롬프트를 확인하려면 리딤코드를 입력해주세요.
           </DialogDescription>
         </DialogHeader>
@@ -72,9 +72,9 @@ export function RedeemCodeModal({ open, onOpenChange, onRedeemSuccess }: RedeemC
             value={code}
             onChange={(e) => setCode(e.target.value)}
             disabled={isSubmitting}
-            className="w-full"
+            className="w-full text-base" // 모바일에서 확대 방지
           />
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-2">
             <Button
               type="button"
               variant="outline"
@@ -83,10 +83,15 @@ export function RedeemCodeModal({ open, onOpenChange, onRedeemSuccess }: RedeemC
                 onOpenChange(false);
               }}
               disabled={isSubmitting}
+              className="w-full sm:w-auto min-h-[44px]"
             >
               취소
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               {isSubmitting ? '처리 중...' : '확인'}
             </Button>
           </div>

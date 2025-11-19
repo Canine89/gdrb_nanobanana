@@ -250,7 +250,7 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                   e.stopPropagation();
                   setCommentModalOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-primary/10 font-medium"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-primary/10 font-medium min-h-[36px]"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글

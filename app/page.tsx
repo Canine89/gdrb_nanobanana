@@ -161,38 +161,39 @@ export default function Home() {
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-12 max-w-7xl">
         {/* 헤더 */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between gap-4 mb-3">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-shrink-0 w-20 h-20 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg ring-2 ring-primary/20">
-                <Image 
-                  src="/ssangcho.png" 
-                  alt="쌩초" 
+        <div className="mb-8 sm:mb-12">
+          {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 mb-3">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg ring-2 ring-primary/20">
+                <Image
+                  src="/ssangcho.png"
+                  alt="쌩초"
                   width={80}
                   height={80}
                   className="object-cover w-full h-full"
                   priority
                 />
               </div>
-              <h1 className="text-5xl font-bold text-foreground font-noto-sans-kr">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground font-noto-sans-kr">
                 나노바나나 AI 슈퍼 프롬프트 🍌
               </h1>
             </div>
-            
+
             {/* 검색 입력 및 리딤코드 버튼 */}
-            <div className="flex-shrink-0 flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:flex-shrink-0 gap-2 sm:gap-2 sm:items-center">
               {!isRedeemCodeActivated && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setRedeemCodeModalOpen(true)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-full sm:w-auto"
                 >
                   <Gift className="h-4 w-4" />
                   리딤코드
                 </Button>
               )}
-              <div className="w-64">
+              <div className="w-full sm:w-64">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input

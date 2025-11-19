@@ -142,7 +142,7 @@ export function PromptCard({ card }: PromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'before-english');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80"
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
                             >
                               <Copy className="h-3 w-3" />
                               복사
@@ -162,7 +162,7 @@ export function PromptCard({ card }: PromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'before-korean');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80"
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
                             >
                               <Copy className="h-3 w-3" />
                               복사
@@ -208,7 +208,7 @@ export function PromptCard({ card }: PromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'after-english');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80"
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
                             >
                               <Copy className="h-3 w-3" />
                               복사
@@ -228,7 +228,7 @@ export function PromptCard({ card }: PromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'after-korean');
                               }}
-                              className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80"
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
                             >
                               <Copy className="h-3 w-3" />
                               복사
@@ -252,7 +252,7 @@ export function PromptCard({ card }: PromptCardProps) {
                   e.stopPropagation();
                   setCommentModalOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs rounded transition-colors text-muted-foreground hover:text-foreground hover:bg-muted min-h-[36px]"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글
