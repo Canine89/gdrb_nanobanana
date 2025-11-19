@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <html lang="ko">
-        <body className={`${inter.className} ${notoSansKR.variable}`}>
+    <html lang="ko">
+      <body className={`${inter.className} ${notoSansKR.variable}`}>
         <AuthProvider>
           {children}
           <Toaster />
