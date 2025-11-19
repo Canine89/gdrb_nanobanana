@@ -58,14 +58,25 @@ export async function getSheetData() {
     };
   } catch (error: any) {
     console.error('Error fetching sheet data:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      response: error.response?.data,
+    });
     
     // 더 자세한 에러 메시지 제공
     if (error.code === 'ENOENT') {
       throw new Error('Service account file not found');
-    } else if (error.code === 403) {
+    } else if (error.code === 403 || error.response?.status === 403) {
       throw new Error('Permission denied. Please check if the service account has access to the spreadsheet.');
-    } else if (error.code === 404) {
-      throw new Error('Spreadsheet not found. Please check the spreadsheet ID.');
+    } else if (error.code === 404 || error.response?.status === 404) {
+      throw new Error(`Spreadsheet not found. Please check the spreadsheet ID: ${SPREADSHEET_ID}`);
+    }
+    
+    // Google API 에러 처리
+    if (error.response?.data?.error) {
+      const apiError = error.response.data.error;
+      throw new Error(`Google API Error: ${apiError.message || JSON.stringify(apiError)}`);
     }
     
     throw error;
