@@ -1,22 +1,25 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  setDoc, 
-  addDoc, 
-  query, 
-  where, 
-  getDocs, 
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  query,
+  where,
+  getDocs,
   onSnapshot,
   increment,
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { initializeFirebase } from './firebase';
 import type { ClickEvent, Comment, PromptStats } from '@/types';
 
 // 클릭 이벤트 기록
 export async function recordClick(promptId: string, userId: string) {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     throw new Error('Firestore is not initialized');
   }
@@ -51,6 +54,9 @@ export async function recordClick(promptId: string, userId: string) {
 
 // 댓글 추가
 export async function addComment(promptId: string, userId: string, content: string) {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     throw new Error('Firestore is not initialized');
   }
@@ -70,6 +76,9 @@ export async function addComment(promptId: string, userId: string, content: stri
 
 // 댓글 조회
 export async function getComments(promptId: string): Promise<Comment[]> {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     throw new Error('Firestore is not initialized');
   }
@@ -99,6 +108,9 @@ export async function getComments(promptId: string): Promise<Comment[]> {
 
 // 프롬프트 통계 조회
 export async function getPromptStats(promptId: string): Promise<PromptStats | null> {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     throw new Error('Firestore is not initialized');
   }
@@ -126,6 +138,9 @@ export function subscribeToPromptStats(
   promptId: string,
   callback: (stats: PromptStats | null) => void
 ) {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     console.error('Firestore is not initialized');
     callback(null);
@@ -163,6 +178,9 @@ export function subscribeToComments(
   promptId: string,
   callback: (comments: Comment[]) => void
 ) {
+  const firebaseInstance = initializeFirebase();
+  const db = firebaseInstance?.db;
+
   if (!db) {
     console.error('Firestore is not initialized');
     callback([]);

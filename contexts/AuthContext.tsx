@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { auth } from '@/lib/firebase';
-import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
+import { initializeFirebase } from '@/lib/firebase';
+import { signInAnonymously, onAuthStateChanged, User, Auth } from 'firebase/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +21,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Firebase 초기화
+    const firebaseInstance = initializeFirebase();
+    const auth = firebaseInstance?.auth;
+
     if (!auth) {
       setLoading(false);
       return;
@@ -33,11 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       } else {
         // 사용자가 없으면 익명 인증 시도
-        if (!auth) {
-          setLoading(false);
-          return;
-        }
-        
         try {
           const userCredential = await signInAnonymously(auth);
           setUser(userCredential.user);
