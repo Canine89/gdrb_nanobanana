@@ -128,22 +128,34 @@ export function subscribeToPromptStats(
 ) {
   if (!db) {
     console.error('Firestore is not initialized');
+    callback(null);
     return () => {};
   }
-  
+
   const statsRef = doc(db, 'promptStats', promptId);
-  
-  return onSnapshot(statsRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.data();
-      callback({
-        promptId: data.promptId || promptId,
-        clickCount: data.clickCount || 0,
-      });
-    } else {
+
+  return onSnapshot(statsRef,
+    (snapshot) => {
+      try {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          callback({
+            promptId: data.promptId || promptId,
+            clickCount: data.clickCount || 0,
+          });
+        } else {
+          callback(null);
+        }
+      } catch (error) {
+        console.error('Error processing prompt stats snapshot:', error);
+        callback(null);
+      }
+    },
+    (error) => {
+      console.error('Error in prompt stats listener:', error);
       callback(null);
     }
-  });
+  );
 }
 
 // 실시간 댓글 리스너
@@ -153,27 +165,39 @@ export function subscribeToComments(
 ) {
   if (!db) {
     console.error('Firestore is not initialized');
+    callback([]);
     return () => {};
   }
-  
+
   const q = query(
     collection(db, 'comments'),
     where('promptId', '==', promptId)
   );
-  
-  return onSnapshot(q, (snapshot) => {
-    const comments = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        promptId: data.promptId,
-        userId: data.userId,
-        content: data.content,
-        timestamp: data.timestamp?.toDate() || new Date(),
-      };
-    }).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    
-    callback(comments);
-  });
+
+  return onSnapshot(q,
+    (snapshot) => {
+      try {
+        const comments = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            promptId: data.promptId,
+            userId: data.userId,
+            content: data.content,
+            timestamp: data.timestamp?.toDate() || new Date(),
+          };
+        }).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+        callback(comments);
+      } catch (error) {
+        console.error('Error processing comments snapshot:', error);
+        callback([]);
+      }
+    },
+    (error) => {
+      console.error('Error in comments listener:', error);
+      callback([]);
+    }
+  );
 }
 
