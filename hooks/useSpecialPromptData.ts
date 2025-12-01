@@ -59,15 +59,17 @@ export function useSpecialPromptData() {
           const card = titleGroups.get(title)!;
 
           // before/after 항목 추가 (값이 있을 때만)
-          // 새 열 구조: A:제목, B:Before이미지, C:BeforeEng, D:BeforeKor, E:BeforeTool, F:After이미지, G:AfterEng, H:AfterKor, I:AfterTool
+          // 새 열 구조: A:제목, B:Before이미지, C:BeforeEng, D:BeforeKor, E:Before꿀팁, F:BeforeTool, G:After이미지, H:AfterEng, I:AfterKor, J:After꿀팁, K:AfterTool
           const beforeImage = (row[1] || '').trim();
           const beforeEnglish = (row[2] || '').trim();
           const beforeKorean = (row[3] || '').trim();
-          const beforeTool = (row[4] || '').trim();
-          const afterImage = (row[5] || '').trim();
-          const afterEnglish = (row[6] || '').trim();
-          const afterKorean = (row[7] || '').trim();
-          const afterTool = (row[8] || '').trim();
+          const beforeTip = (row[4] || '').trim();
+          const beforeTool = (row[5] || '').trim();
+          const afterImage = (row[6] || '').trim();
+          const afterEnglish = (row[7] || '').trim();
+          const afterKorean = (row[8] || '').trim();
+          const afterTip = (row[9] || '').trim();
+          const afterTool = (row[10] || '').trim();
 
           if (beforeEnglish || beforeKorean || beforeImage) {
             card.beforeItems.push({
@@ -76,6 +78,7 @@ export function useSpecialPromptData() {
               korean: beforeKorean,
               tool: beforeTool || undefined,
               image: beforeImage || undefined,
+              tip: beforeTip || undefined,
             });
           }
 
@@ -86,6 +89,7 @@ export function useSpecialPromptData() {
               korean: afterKorean,
               tool: afterTool || undefined,
               image: afterImage || undefined,
+              tip: afterTip || undefined,
             });
           }
         });

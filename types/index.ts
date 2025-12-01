@@ -11,6 +11,7 @@ export interface BeforeAfterItem {
   korean: string;
   tool?: string;
   image?: string; // 이미지 URL
+  tip?: string; // 꿀팁
 }
 
 export interface PromptCard {

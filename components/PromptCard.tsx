@@ -13,6 +13,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { CommentModal } from './CommentModal';
 import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
@@ -76,7 +82,15 @@ function renderTitle(title: string): React.ReactNode {
 export function PromptCard({ card }: PromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [tipModalOpen, setTipModalOpen] = useState(false);
+  const [currentTip, setCurrentTip] = useState<string>('');
   const { userId } = useAuth();
+
+  const handleTipClick = (tip: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentTip(tip);
+    setTipModalOpen(true);
+  };
 
   useEffect(() => {
     const unsubscribe = subscribeToPromptStats(card.id, (updatedStats) => {
@@ -166,16 +180,26 @@ export function PromptCard({ card }: PromptCardProps) {
                         <div className="mb-3">
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs text-muted-foreground">English</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopy(item.english, 'before-english');
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
-                            >
-                              <Copy className="h-3 w-3" />
-                              복사
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {item.tip && (
+                                <button
+                                  onClick={(e) => handleTipClick(item.tip!, e)}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
+                                >
+                                  🐝 꿀팁
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(item.english, 'before-english');
+                                }}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
+                              >
+                                <Copy className="h-3 w-3" />
+                                복사
+                              </button>
+                            </div>
                           </div>
                           <div className="p-3 rounded border border-border bg-muted text-xs font-mono whitespace-pre-wrap break-words text-foreground">
                             {renderBoldText(item.english)}
@@ -186,16 +210,26 @@ export function PromptCard({ card }: PromptCardProps) {
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs text-muted-foreground">한국어</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopy(item.korean, 'before-korean');
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
-                            >
-                              <Copy className="h-3 w-3" />
-                              복사
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {item.tip && !item.english && (
+                                <button
+                                  onClick={(e) => handleTipClick(item.tip!, e)}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
+                                >
+                                  🐝 꿀팁
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(item.korean, 'before-korean');
+                                }}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-secondary text-secondary-foreground hover:opacity-80 min-h-[32px]"
+                              >
+                                <Copy className="h-3 w-3" />
+                                복사
+                              </button>
+                            </div>
                           </div>
                           <div className="p-3 rounded border border-border bg-muted text-xs whitespace-pre-wrap break-words text-foreground">
                             {renderBoldText(item.korean)}
@@ -242,16 +276,26 @@ export function PromptCard({ card }: PromptCardProps) {
                         <div className="mb-3">
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs text-muted-foreground">English</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopy(item.english, 'after-english');
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
-                            >
-                              <Copy className="h-3 w-3" />
-                              복사
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {item.tip && (
+                                <button
+                                  onClick={(e) => handleTipClick(item.tip!, e)}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
+                                >
+                                  🐝 꿀팁
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(item.english, 'after-english');
+                                }}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
+                              >
+                                <Copy className="h-3 w-3" />
+                                복사
+                              </button>
+                            </div>
                           </div>
                           <div className="p-3 rounded border border-border bg-muted text-xs font-mono whitespace-pre-wrap break-words text-foreground">
                             {renderBoldText(item.english)}
@@ -262,16 +306,26 @@ export function PromptCard({ card }: PromptCardProps) {
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs text-muted-foreground">한국어</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopy(item.korean, 'after-korean');
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
-                            >
-                              <Copy className="h-3 w-3" />
-                              복사
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {item.tip && !item.english && (
+                                <button
+                                  onClick={(e) => handleTipClick(item.tip!, e)}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
+                                >
+                                  🐝 꿀팁
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(item.korean, 'after-korean');
+                                }}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs rounded transition-colors bg-primary text-primary-foreground hover:opacity-80 min-h-[32px]"
+                              >
+                                <Copy className="h-3 w-3" />
+                                복사
+                              </button>
+                            </div>
                           </div>
                           <div className="p-3 rounded border border-border bg-muted text-xs whitespace-pre-wrap break-words text-foreground">
                             {renderBoldText(item.korean)}
@@ -312,6 +366,22 @@ export function PromptCard({ card }: PromptCardProps) {
         open={commentModalOpen}
         onOpenChange={setCommentModalOpen}
       />
+
+      {/* 꿀팁 모달 */}
+      <Dialog open={tipModalOpen} onOpenChange={setTipModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+              🐝 꿀팁
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <p className="text-sm text-amber-800 dark:text-amber-200 whitespace-pre-wrap">
+              {currentTip}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
