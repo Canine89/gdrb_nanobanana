@@ -54,6 +54,25 @@ function renderBoldText(text: string): React.ReactNode {
   return parts.length > 0 ? <>{parts}</> : text;
 }
 
+function renderTitle(title: string): React.ReactNode {
+  // "미친 활용 XX" 패턴 매칭 (XX는 숫자)
+  const match = title.match(/^(미친 활용\s*\d+)\s*(.*)$/);
+
+  if (match) {
+    const [, prefix, rest] = match;
+    return (
+      <>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold mr-2 bg-primary/20 text-primary border border-primary/40">
+          {prefix}
+        </span>
+        <span>{rest}</span>
+      </>
+    );
+  }
+
+  return title;
+}
+
 export function PromptCard({ card }: PromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
@@ -95,8 +114,8 @@ export function PromptCard({ card }: PromptCardProps) {
             {/* 헤더 */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold mb-1 line-clamp-2 text-card-foreground">
-                  {card.title}
+                <h3 className="text-base font-semibold mb-1 line-clamp-2 text-card-foreground flex flex-wrap items-center">
+                  {renderTitle(card.title)}
                 </h3>
               </div>
               <TooltipProvider>

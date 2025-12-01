@@ -51,6 +51,29 @@ function renderBoldText(text: string): React.ReactNode {
   return parts.length > 0 ? <>{parts}</> : text;
 }
 
+function renderTitle(title: string, isSuper: boolean): React.ReactNode {
+  // "미친 활용 XX" 패턴 매칭 (XX는 숫자)
+  const match = title.match(/^(미친 활용\s*\d+)\s*(.*)$/);
+
+  if (match) {
+    const [, prefix, rest] = match;
+    return (
+      <>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold mr-2 ${
+          isSuper
+            ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40'
+            : 'bg-primary/20 text-primary border border-primary/40'
+        }`}>
+          {prefix}
+        </span>
+        <span>{rest}</span>
+      </>
+    );
+  }
+
+  return title;
+}
+
 export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
@@ -101,10 +124,10 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
                   ) : (
                     <Sparkles className="h-4 w-4 text-primary animate-pulse" />
                   )}
-                  <h3 className={`text-base font-semibold line-clamp-2 ${
+                  <h3 className={`text-base font-semibold line-clamp-2 flex flex-wrap items-center ${
                     isSuper ? 'text-amber-600 dark:text-amber-400' : 'text-primary shimmer-text'
                   }`}>
-                    {card.title}
+                    {renderTitle(card.title, isSuper)}
                   </h3>
                 </div>
               </div>
