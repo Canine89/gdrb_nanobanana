@@ -18,10 +18,11 @@ import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PromptCard as PromptCardType, PromptStats } from '@/types';
-import { MessageSquare, Copy, Sparkles } from 'lucide-react';
+import { MessageSquare, Copy, Sparkles, Crown } from 'lucide-react';
 
 interface SpecialPromptCardProps {
   card: PromptCardType;
+  isSuper?: boolean;
 }
 
 function getScoreText(clickCount: number): string {
@@ -50,7 +51,7 @@ function renderBoldText(text: string): React.ReactNode {
   return parts.length > 0 ? <>{parts}</> : text;
 }
 
-export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
+export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const { userId } = useAuth();
@@ -86,13 +87,23 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div className="group relative bg-gradient-to-br from-card via-primary/8 to-primary/12 rounded-lg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col border-2 border-primary/40 ring-1 ring-primary/20">
+          <div className={`group relative rounded-lg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col ${
+            isSuper
+              ? 'bg-gradient-to-br from-amber-50 via-yellow-100/50 to-orange-100/30 dark:from-amber-950/40 dark:via-yellow-900/20 dark:to-orange-900/10 border-2 border-amber-400/60 ring-1 ring-amber-300/40'
+              : 'bg-gradient-to-br from-card via-primary/8 to-primary/12 border-2 border-primary/40 ring-1 ring-primary/20'
+          }`}>
             {/* 헤더 */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                  <h3 className="text-base font-semibold line-clamp-2 text-primary shimmer-text">
+                  {isSuper ? (
+                    <Crown className="h-4 w-4 text-amber-500 animate-pulse" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                  )}
+                  <h3 className={`text-base font-semibold line-clamp-2 ${
+                    isSuper ? 'text-amber-600 dark:text-amber-400' : 'text-primary shimmer-text'
+                  }`}>
                     {card.title}
                   </h3>
                 </div>
@@ -100,7 +111,11 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/15 text-primary text-xs font-semibold shrink-0 border border-primary/30 shadow-sm">
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold shrink-0 shadow-sm ${
+                      isSuper
+                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40'
+                        : 'bg-primary/15 text-primary border border-primary/30'
+                    }`}>
                       <span>{getScoreText(clickCount)}</span>
                     </div>
                   </TooltipTrigger>
@@ -125,7 +140,11 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/25 shadow-sm">
+                            <span key={idx} className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium shadow-sm ${
+                              isSuper
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/30'
+                                : 'bg-primary/10 text-primary border border-primary/25'
+                            }`}>
                               {tool.trim()}
                             </span>
                           ))}
@@ -140,13 +159,21 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'before-english');
                               }}
-                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
+                              className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
+                                isSuper
+                                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
+                                  : 'bg-primary/15 text-primary hover:bg-primary/25'
+                              }`}
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm">
+                          <div className={`p-3 rounded-md text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm ${
+                            isSuper
+                              ? 'border border-amber-400/20 bg-amber-500/8'
+                              : 'border border-primary/20 bg-primary/8'
+                          }`}>
                             {renderBoldText(item.english)}
                           </div>
                         </div>
@@ -160,13 +187,21 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'before-korean');
                               }}
-                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
+                              className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
+                                isSuper
+                                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
+                                  : 'bg-primary/15 text-primary hover:bg-primary/25'
+                              }`}
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs whitespace-pre-wrap break-words text-foreground shadow-sm">
+                          <div className={`p-3 rounded-md text-xs whitespace-pre-wrap break-words text-foreground shadow-sm ${
+                            isSuper
+                              ? 'border border-amber-400/20 bg-amber-500/8'
+                              : 'border border-primary/20 bg-primary/8'
+                          }`}>
                             {renderBoldText(item.korean)}
                           </div>
                         </div>
@@ -191,7 +226,11 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                       {item.tool && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/25 shadow-sm">
+                            <span key={idx} className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium shadow-sm ${
+                              isSuper
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/30'
+                                : 'bg-primary/10 text-primary border border-primary/25'
+                            }`}>
                               {tool.trim()}
                             </span>
                           ))}
@@ -206,13 +245,21 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.english, 'after-english');
                               }}
-                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
+                              className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
+                                isSuper
+                                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
+                                  : 'bg-primary/15 text-primary hover:bg-primary/25'
+                              }`}
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm">
+                          <div className={`p-3 rounded-md text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm ${
+                            isSuper
+                              ? 'border border-amber-400/20 bg-amber-500/8'
+                              : 'border border-primary/20 bg-primary/8'
+                          }`}>
                             {renderBoldText(item.english)}
                           </div>
                         </div>
@@ -226,13 +273,21 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
                                 e.stopPropagation();
                                 handleCopy(item.korean, 'after-korean');
                               }}
-                              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors bg-primary/15 text-primary hover:bg-primary/25 font-medium shadow-sm"
+                              className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
+                                isSuper
+                                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
+                                  : 'bg-primary/15 text-primary hover:bg-primary/25'
+                              }`}
                             >
                               <Copy className="h-3 w-3" />
                               복사
                             </button>
                           </div>
-                          <div className="p-3 rounded-md border border-primary/20 bg-primary/8 text-xs whitespace-pre-wrap break-words text-foreground shadow-sm">
+                          <div className={`p-3 rounded-md text-xs whitespace-pre-wrap break-words text-foreground shadow-sm ${
+                            isSuper
+                              ? 'border border-amber-400/20 bg-amber-500/8'
+                              : 'border border-primary/20 bg-primary/8'
+                          }`}>
                             {renderBoldText(item.korean)}
                           </div>
                         </div>
@@ -244,7 +299,9 @@ export function SpecialPromptCard({ card }: SpecialPromptCardProps) {
             )}
 
             {/* 푸터 */}
-            <div className="pt-4 border-t border-primary/20 flex items-center justify-end mt-4">
+            <div className={`pt-4 flex items-center justify-end mt-4 ${
+              isSuper ? 'border-t border-amber-400/20' : 'border-t border-primary/20'
+            }`}>
               <button
                 onClick={(e) => {
                   e.stopPropagation();

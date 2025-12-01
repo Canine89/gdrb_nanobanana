@@ -7,14 +7,7 @@ export function useSpecialPromptData() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 리딤코드 활성화 여부 확인
-    const isActivated = localStorage.getItem('redeemCodeActivated') === 'true';
-    
-    if (!isActivated) {
-      setLoading(false);
-      return;
-    }
-
+    // 스페셜 프롬프트는 항상 로드 (로그인 시 기본 표시)
     async function fetchData() {
       try {
         setLoading(true);

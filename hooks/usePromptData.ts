@@ -7,6 +7,14 @@ export function usePromptData() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 슈퍼 프롬프트는 리딤코드 활성화 시에만 로드
+    const isActivated = localStorage.getItem('redeemCodeActivated') === 'true';
+
+    if (!isActivated) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchData() {
       try {
         setLoading(true);
@@ -47,7 +55,7 @@ export function usePromptData() {
           if (!titleGroups.has(title)) {
             // 새로운 제목이면 카드 생성
             titleGroups.set(title, {
-              id: `title-${title.replace(/\s+/g, '-')}-${rowIndex + 1}`,
+              id: `super-${title.replace(/\s+/g, '-')}-${rowIndex + 1}`,
               title,
               beforeItems: [],
               afterItems: [],

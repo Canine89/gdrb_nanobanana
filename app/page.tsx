@@ -31,33 +31,68 @@ export default function Home() {
   const [redeemCodeModalOpen, setRedeemCodeModalOpen] = useState(false);
   const [isRedeemCodeActivated, setIsRedeemCodeActivated] = useState(false);
   
-  // 검색 필터링
-  const filteredCards = useMemo(() => {
+  // 스페셜 프롬프트 검색 필터링 (항상 표시 - 로그인 시 기본)
+  const filteredSpecialCards = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return specialCards;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return specialCards.filter((card: PromptCardType) => {
+      const title = card.title?.toLowerCase() || '';
+
+      const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
+        ? card.beforeItems[0].tool.toLowerCase()
+        : '';
+
+      const beforeMatches = card.beforeItems.some(item =>
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+
+      const afterMatches = card.afterItems.some(item =>
+        item.english.toLowerCase().includes(query) ||
+        item.korean.toLowerCase().includes(query)
+      );
+
+      return (
+        title.includes(query) ||
+        tool.includes(query) ||
+        beforeMatches ||
+        afterMatches
+      );
+    });
+  }, [specialCards, searchQuery]);
+
+  // 슈퍼 프롬프트 검색 필터링 (리딤코드 활성화 시에만 표시)
+  const filteredSuperCards = useMemo(() => {
+    if (!isRedeemCodeActivated) return [];
+
     if (!searchQuery.trim()) {
       return promptCards;
     }
-    
+
     const query = searchQuery.toLowerCase();
     return promptCards.filter((card: PromptCardType) => {
       const title = card.title?.toLowerCase() || '';
-      
+
       // 첫 번째 beforeItem의 tool 검색
       const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
         ? card.beforeItems[0].tool.toLowerCase()
         : '';
-      
+
       // 모든 beforeItems 검색
-      const beforeMatches = card.beforeItems.some(item => 
+      const beforeMatches = card.beforeItems.some(item =>
         item.english.toLowerCase().includes(query) ||
         item.korean.toLowerCase().includes(query)
       );
-      
+
       // 모든 afterItems 검색
-      const afterMatches = card.afterItems.some(item => 
+      const afterMatches = card.afterItems.some(item =>
         item.english.toLowerCase().includes(query) ||
         item.korean.toLowerCase().includes(query)
       );
-      
+
       return (
         title.includes(query) ||
         tool.includes(query) ||
@@ -65,47 +100,12 @@ export default function Home() {
         afterMatches
       );
     });
-  }, [promptCards, searchQuery]);
+  }, [promptCards, searchQuery, isRedeemCodeActivated]);
 
-  // 스페셜 프롬프트 검색 필터링
-  const filteredSpecialCards = useMemo(() => {
-    if (!isRedeemCodeActivated) return [];
-    
-    if (!searchQuery.trim()) {
-      return specialCards;
-    }
-    
-    const query = searchQuery.toLowerCase();
-    return specialCards.filter((card: PromptCardType) => {
-      const title = card.title?.toLowerCase() || '';
-      
-      const tool = card.beforeItems.length > 0 && card.beforeItems[0].tool
-        ? card.beforeItems[0].tool.toLowerCase()
-        : '';
-      
-      const beforeMatches = card.beforeItems.some(item => 
-        item.english.toLowerCase().includes(query) ||
-        item.korean.toLowerCase().includes(query)
-      );
-      
-      const afterMatches = card.afterItems.some(item => 
-        item.english.toLowerCase().includes(query) ||
-        item.korean.toLowerCase().includes(query)
-      );
-      
-      return (
-        title.includes(query) ||
-        tool.includes(query) ||
-        beforeMatches ||
-        afterMatches
-      );
-    });
-  }, [specialCards, searchQuery, isRedeemCodeActivated]);
-
-  // 통합된 카드 배열 (스페셜 프롬프트가 앞에 배치)
+  // 통합된 카드 배열 (스페셜 프롬프트가 앞에, 슈퍼 프롬프트가 뒤에 배치)
   const allFilteredCards = useMemo(() => {
-    return [...filteredSpecialCards, ...filteredCards];
-  }, [filteredSpecialCards, filteredCards]);
+    return [...filteredSpecialCards, ...filteredSuperCards];
+  }, [filteredSpecialCards, filteredSuperCards]);
   
   // 페이지네이션 (첫 페이지에 표지가 있으므로 카드는 itemsPerPage - 1개, 나머지는 itemsPerPage개)
   const totalPages = Math.ceil((allFilteredCards.length + 1) / itemsPerPage); // 표지 포함
@@ -313,14 +313,14 @@ export default function Home() {
               </div>
             )}
             
-            {/* 실제 카드들 (스페셜 프롬프트가 앞에 배치) */}
+            {/* 실제 카드들 (스페셜 프롬프트가 앞에, 슈퍼 프롬프트가 뒤에 배치) */}
             {paginatedCards.map((card) => {
-              // 스페셜 프롬프트인지 확인 (ID에 'special-'이 포함되어 있음)
-              const isSpecial = card.id.startsWith('special-');
+              // 슈퍼 프롬프트인지 확인 (ID에 'super-'가 포함되어 있음)
+              const isSuper = card.id.startsWith('super-');
               return (
                 <div key={card.id} className="mb-4">
-                  {isSpecial ? (
-                    <SpecialPromptCard card={card} />
+                  {isSuper ? (
+                    <SpecialPromptCard card={card} isSuper />
                   ) : (
                     <PromptCard card={card} />
                   )}
