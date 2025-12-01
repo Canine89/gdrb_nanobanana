@@ -13,6 +13,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { CommentModal } from './CommentModal';
 import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
@@ -168,18 +173,22 @@ export function PromptCard({ card }: PromptCardProps) {
                             <span className="text-xs text-muted-foreground">English</span>
                             <div className="flex items-center gap-2">
                               {item.tip && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
-                                        🐝 꿀팁
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-xs">
-                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+                                    >
+                                      🐝 꿀팁
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )}
                               <button
                                 onClick={(e) => {
@@ -204,18 +213,22 @@ export function PromptCard({ card }: PromptCardProps) {
                             <span className="text-xs text-muted-foreground">한국어</span>
                             <div className="flex items-center gap-2">
                               {item.tip && !item.english && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
-                                        🐝 꿀팁
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-xs">
-                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+                                    >
+                                      🐝 꿀팁
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )}
                               <button
                                 onClick={(e) => {
@@ -276,18 +289,22 @@ export function PromptCard({ card }: PromptCardProps) {
                             <span className="text-xs text-muted-foreground">English</span>
                             <div className="flex items-center gap-2">
                               {item.tip && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
-                                        🐝 꿀팁
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-xs">
-                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+                                    >
+                                      🐝 꿀팁
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )}
                               <button
                                 onClick={(e) => {
@@ -312,18 +329,22 @@ export function PromptCard({ card }: PromptCardProps) {
                             <span className="text-xs text-muted-foreground">한국어</span>
                             <div className="flex items-center gap-2">
                               {item.tip && !item.english && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
-                                        🐝 꿀팁
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-xs">
-                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+                                    >
+                                      🐝 꿀팁
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )}
                               <button
                                 onClick={(e) => {
