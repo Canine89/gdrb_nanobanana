@@ -107,17 +107,11 @@ export default function Home() {
     return [...filteredSuperCards, ...filteredSpecialCards];
   }, [filteredSuperCards, filteredSpecialCards]);
   
-  // 페이지네이션 (첫 페이지에 표지가 있으므로 카드는 itemsPerPage - 1개, 나머지는 itemsPerPage개)
-  const totalPages = Math.ceil((allFilteredCards.length + 1) / itemsPerPage); // 표지 포함
+  // 페이지네이션
+  const totalPages = Math.ceil(allFilteredCards.length / itemsPerPage);
   const paginatedCards = useMemo(() => {
-    if (currentPage === 1) {
-      // 첫 페이지: 표지 1개 + 카드 (itemsPerPage - 1)개
-      return allFilteredCards.slice(0, itemsPerPage - 1);
-    } else {
-      // 나머지 페이지: 카드 itemsPerPage개 (표지 제외하고 계산)
-      const startIndex = (currentPage - 1) * itemsPerPage - 1; // 첫 페이지의 표지 자리 제외
-      return allFilteredCards.slice(startIndex, startIndex + itemsPerPage);
-    }
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return allFilteredCards.slice(startIndex, startIndex + itemsPerPage);
   }, [allFilteredCards, currentPage, itemsPerPage]);
   
   // 검색어 변경 시 첫 페이지로 이동
@@ -258,37 +252,56 @@ export default function Home() {
           </div>
         )}
 
-        {/* 카드 그리드 (표지 + 카드들) - Masonry 레이아웃 */}
-        {loading ? (
-          <PromptTable promptCards={[]} loading={true} />
-        ) : (
-          <Masonry
-            breakpointCols={{
-              default: 3,
-              1024: 3,
-              768: 2,
-              640: 1,
-            }}
-            className="flex -ml-4 w-auto"
-            columnClassName="pl-4 bg-clip-padding"
-          >
-            {/* 도서 표지 - 첫 번째 위치 (첫 페이지에만 표시) */}
-            {currentPage === 1 && (
-              <div className="group relative bg-card rounded-lg p-3 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col border border-border mb-4">
-                {/* 표지 이미지 */}
-                <div className="relative w-full flex items-center justify-center mb-3">
-                  <Image 
-                    src="/nanobanana_cover_3d.png" 
-                    alt="나노바나나 AI 비포&애프터 미친 활용법 71제 도서 표지" 
-                    width={400}
-                    height={533}
+        {/* 메인 콘텐츠 + 사이드 배너 레이아웃 */}
+        <div className="flex gap-6">
+          {/* 왼쪽: 카드 그리드 - Masonry 레이아웃 */}
+          <div className="flex-1 min-w-0">
+            {loading ? (
+              <PromptTable promptCards={[]} loading={true} />
+            ) : (
+              <Masonry
+                breakpointCols={{
+                  default: 3,
+                  1024: 2,
+                  768: 2,
+                  640: 1,
+                }}
+                className="flex -ml-4 w-auto"
+                columnClassName="pl-4 bg-clip-padding"
+              >
+                {paginatedCards.map((card) => {
+                  const isSuper = card.id.startsWith('super-');
+                  return (
+                    <div key={card.id} className="mb-4">
+                      {isSuper ? (
+                        <SpecialPromptCard card={card} isSuper />
+                      ) : (
+                        <PromptCard card={card} />
+                      )}
+                    </div>
+                  );
+                })}
+              </Masonry>
+            )}
+          </div>
+
+          {/* 오른쪽: 도서 광고 배너 (데스크톱에서만 표시) */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="sticky top-6">
+              <div className="bg-card rounded-lg p-4 shadow-lg border border-border hover:shadow-xl transition-shadow duration-300">
+                {/* 도서 표지 이미지 */}
+                <div className="relative w-full flex items-center justify-center mb-4">
+                  <Image
+                    src="/nanobanana_cover_3d.png"
+                    alt="나노바나나 AI 비포&애프터 미친 활용법 71제 도서 표지"
+                    width={240}
+                    height={320}
                     className="object-contain w-full drop-shadow-xl"
-                    priority
                   />
                 </div>
-                
+
                 {/* 설명 글 */}
-                <div className="space-y-1.5 mb-3">
+                <div className="space-y-2 mb-4">
                   <p className="text-xs font-medium text-foreground leading-tight">
                     ★ 클릭 몇 번으로 이렇게 달라진다고!
                   </p>
@@ -299,7 +312,7 @@ export default function Home() {
                     ★ 포토샵 없이, 스튜디오 촬영 없이 만드는 71가지 고퀄리티 사진
                   </p>
                 </div>
-                
+
                 {/* 구매 버튼 */}
                 <Button
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
@@ -310,24 +323,9 @@ export default function Home() {
                   도서 구매하기
                 </Button>
               </div>
-            )}
-            
-            {/* 실제 카드들 (스페셜 프롬프트가 앞에, 슈퍼 프롬프트가 뒤에 배치) */}
-            {paginatedCards.map((card) => {
-              // 슈퍼 프롬프트인지 확인 (ID에 'super-'가 포함되어 있음)
-              const isSuper = card.id.startsWith('super-');
-              return (
-                <div key={card.id} className="mb-4">
-                  {isSuper ? (
-                    <SpecialPromptCard card={card} isSuper />
-                  ) : (
-                    <PromptCard card={card} />
-                  )}
-                </div>
-              );
-            })}
-          </Masonry>
-        )}
+            </div>
+          </aside>
+        </div>
 
         {/* 리딤코드 모달 */}
         <RedeemCodeModal
