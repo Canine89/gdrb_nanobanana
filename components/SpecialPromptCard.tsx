@@ -57,8 +57,8 @@ function renderBoldText(text: string): React.ReactNode {
 }
 
 function renderTitle(title: string, isSuper: boolean): React.ReactNode {
-  // "미친 활용 XX" 패턴 매칭 (XX는 숫자)
-  const match = title.match(/^(미친 활용\s*\d+)\s*(.*)$/);
+  // "미친 활용 XX" 또는 "스페셜 프롬프트 XX" 패턴 매칭 (XX는 숫자)
+  const match = title.match(/^((?:미친 활용|스페셜 프롬프트)\s*\d+)\s*(.*)$/);
 
   if (match) {
     const [, prefix, rest] = match;
