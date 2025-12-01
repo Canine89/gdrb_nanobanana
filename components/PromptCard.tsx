@@ -152,6 +152,16 @@ export function PromptCard({ card }: PromptCardProps) {
                           ))}
                         </div>
                       )}
+                      {/* Before 이미지 */}
+                      {item.image && (
+                        <div className="mb-3">
+                          <img
+                            src={item.image}
+                            alt="Before"
+                            className="w-full rounded-lg border border-border shadow-sm"
+                          />
+                        </div>
+                      )}
                       {item.english && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between mb-1.5">
@@ -216,6 +226,16 @@ export function PromptCard({ card }: PromptCardProps) {
                               {tool.trim()}
                             </span>
                           ))}
+                        </div>
+                      )}
+                      {/* After 이미지 */}
+                      {item.image && (
+                        <div className="mb-3">
+                          <img
+                            src={item.image}
+                            alt="After"
+                            className="w-full rounded-lg border border-border shadow-sm"
+                          />
                         </div>
                       )}
                       {item.english && (

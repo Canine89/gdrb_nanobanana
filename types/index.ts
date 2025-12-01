@@ -10,6 +10,7 @@ export interface BeforeAfterItem {
   english: string;
   korean: string;
   tool?: string;
+  image?: string; // 이미지 URL
 }
 
 export interface PromptCard {
