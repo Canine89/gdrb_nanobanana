@@ -301,11 +301,10 @@ export default function Home() {
                 </div>
                 
                 {/* 구매 버튼 */}
-                <Button 
+                <Button
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
                   onClick={() => {
-                    // 도서 구매 링크로 이동 (실제 링크로 교체 필요)
-                    window.open('https://example.com/purchase', '_blank');
+                    window.open('https://www.yes24.com/product/goods/167400825', '_blank');
                   }}
                 >
                   도서 구매하기
