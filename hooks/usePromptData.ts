@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { SheetData, PromptCard } from '@/types';
+import { convertGoogleDriveUrl } from '@/lib/utils';
 
 export function usePromptData() {
   const [data, setData] = useState<SheetData | null>(null);
@@ -84,7 +85,7 @@ export function usePromptData() {
               english: beforeEnglish,
               korean: beforeKorean,
               tool: beforeTool || undefined,
-              image: beforeImage || undefined,
+              image: convertGoogleDriveUrl(beforeImage) || undefined,
               tip: beforeTip || undefined,
             });
           }
@@ -95,7 +96,7 @@ export function usePromptData() {
               english: afterEnglish,
               korean: afterKorean,
               tool: afterTool || undefined,
-              image: afterImage || undefined,
+              image: convertGoogleDriveUrl(afterImage) || undefined,
               tip: afterTip || undefined,
             });
           }
