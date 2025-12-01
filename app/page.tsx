@@ -102,10 +102,10 @@ export default function Home() {
     });
   }, [promptCards, searchQuery, isRedeemCodeActivated]);
 
-  // 통합된 카드 배열 (스페셜 프롬프트가 앞에, 슈퍼 프롬프트가 뒤에 배치)
+  // 통합된 카드 배열 (슈퍼 프롬프트가 앞에, 스페셜 프롬프트가 뒤에 배치)
   const allFilteredCards = useMemo(() => {
-    return [...filteredSpecialCards, ...filteredSuperCards];
-  }, [filteredSpecialCards, filteredSuperCards]);
+    return [...filteredSuperCards, ...filteredSpecialCards];
+  }, [filteredSuperCards, filteredSpecialCards]);
   
   // 페이지네이션 (첫 페이지에 표지가 있으므로 카드는 itemsPerPage - 1개, 나머지는 itemsPerPage개)
   const totalPages = Math.ceil((allFilteredCards.length + 1) / itemsPerPage); // 표지 포함
