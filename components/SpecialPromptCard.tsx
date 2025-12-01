@@ -13,12 +13,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { CommentModal } from './CommentModal';
 import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
@@ -83,15 +77,7 @@ function renderTitle(title: string, isSuper: boolean): React.ReactNode {
 export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
-  const [tipModalOpen, setTipModalOpen] = useState(false);
-  const [currentTip, setCurrentTip] = useState<string>('');
   const { userId } = useAuth();
-
-  const handleTipClick = (tip: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentTip(tip);
-    setTipModalOpen(true);
-  };
 
   useEffect(() => {
     const unsubscribe = subscribeToPromptStats(card.id, (updatedStats) => {
@@ -207,12 +193,18 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
                             <span className="text-xs text-muted-foreground">English</span>
                             <div className="flex items-center gap-2">
                               {item.tip && (
-                                <button
-                                  onClick={(e) => handleTipClick(item.tip!, e)}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
-                                >
-                                  🐝 꿀팁
-                                </button>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
+                                        🐝 꿀팁
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-xs">
+                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
                               <button
                                 onClick={(e) => {
@@ -245,12 +237,18 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
                             <span className="text-xs text-muted-foreground">한국어</span>
                             <div className="flex items-center gap-2">
                               {item.tip && !item.english && (
-                                <button
-                                  onClick={(e) => handleTipClick(item.tip!, e)}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
-                                >
-                                  🐝 꿀팁
-                                </button>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
+                                        🐝 꿀팁
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-xs">
+                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
                               <button
                                 onClick={(e) => {
@@ -327,12 +325,18 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
                             <span className="text-xs text-muted-foreground">English</span>
                             <div className="flex items-center gap-2">
                               {item.tip && (
-                                <button
-                                  onClick={(e) => handleTipClick(item.tip!, e)}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
-                                >
-                                  🐝 꿀팁
-                                </button>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
+                                        🐝 꿀팁
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-xs">
+                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
                               <button
                                 onClick={(e) => {
@@ -365,12 +369,18 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
                             <span className="text-xs text-muted-foreground">한국어</span>
                             <div className="flex items-center gap-2">
                               {item.tip && !item.english && (
-                                <button
-                                  onClick={(e) => handleTipClick(item.tip!, e)}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded transition-colors bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 min-h-[32px] border border-amber-300 dark:border-amber-700"
-                                >
-                                  🐝 꿀팁
-                                </button>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 cursor-help">
+                                        🐝 꿀팁
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-xs">
+                                      <p className="text-xs whitespace-pre-wrap">{item.tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
                               <button
                                 onClick={(e) => {
@@ -433,22 +443,6 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
         open={commentModalOpen}
         onOpenChange={setCommentModalOpen}
       />
-
-      {/* 꿀팁 모달 */}
-      <Dialog open={tipModalOpen} onOpenChange={setTipModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-              🐝 꿀팁
-            </DialogTitle>
-          </DialogHeader>
-          <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-            <p className="text-sm text-amber-800 dark:text-amber-200 whitespace-pre-wrap">
-              {currentTip}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
