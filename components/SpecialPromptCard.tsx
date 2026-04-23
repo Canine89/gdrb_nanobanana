@@ -24,15 +24,25 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PromptCard as PromptCardType, PromptStats } from '@/types';
 import { MessageSquare, Copy, Sparkles, Crown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SpecialPromptCardProps {
   card: PromptCardType;
   isSuper?: boolean;
+  sourceBadge?: string;
 }
 
 function getScoreText(clickCount: number): string {
   if (clickCount === 0) return '0';
   return clickCount.toString();
+}
+
+function parseTitle(title: string): { prefix: string | null; rest: string } {
+  const match = title.match(/^((?:미친 활용|스페셜 프롬프트)\s*\d+)\s*(.*)$/);
+  if (match) {
+    return { prefix: match[1], rest: match[2].trim() };
+  }
+  return { prefix: null, rest: title };
 }
 
 function renderBoldText(text: string): React.ReactNode {
@@ -45,7 +55,11 @@ function renderBoldText(text: string): React.ReactNode {
     if (match.index > lastIndex) {
       parts.push(text.substring(lastIndex, match.index));
     }
-    parts.push(<strong key={match.index}>{match[1]}</strong>);
+    parts.push(
+      <strong key={match.index} className="font-semibold text-foreground">
+        {match[1]}
+      </strong>
+    );
     lastIndex = regex.lastIndex;
   }
 
@@ -56,30 +70,7 @@ function renderBoldText(text: string): React.ReactNode {
   return parts.length > 0 ? <>{parts}</> : text;
 }
 
-function renderTitle(title: string, isSuper: boolean): React.ReactNode {
-  // "미친 활용 XX" 또는 "스페셜 프롬프트 XX" 패턴 매칭 (XX는 숫자)
-  const match = title.match(/^((?:미친 활용|스페셜 프롬프트)\s*\d+)\s*(.*)$/);
-
-  if (match) {
-    const [, prefix, rest] = match;
-    return (
-      <>
-        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold mr-2 ${
-          isSuper
-            ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40'
-            : 'bg-primary/20 text-primary border border-primary/40'
-        }`}>
-          {prefix}
-        </span>
-        <span>{rest}</span>
-      </>
-    );
-  }
-
-  return title;
-}
-
-export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardProps) {
+export function SpecialPromptCard({ card, isSuper = false, sourceBadge }: SpecialPromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const { userId } = useAuth();
@@ -88,7 +79,6 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
     const unsubscribe = subscribeToPromptStats(card.id, (updatedStats) => {
       setStats(updatedStats);
     });
-
     return () => unsubscribe();
   }, [card.id]);
 
@@ -97,11 +87,9 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
       toast.error('인증 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
-
     try {
       await navigator.clipboard.writeText(text);
       toast.success(`${type}가 클립보드에 복사되었습니다!`);
-      
       await recordClick(card.id, userId);
     } catch (error) {
       console.error('Error copying to clipboard:', error);
@@ -110,346 +98,245 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
   };
 
   const clickCount = stats?.clickCount || 0;
+  const { prefix, rest } = parseTitle(card.title);
+
+  // 카드 외곽: ivory 바탕 + 테라코타 링 강도로 super/special 구분
+  const surfaceCls = isSuper
+    ? 'bg-claude-ivory ring-2 ring-primary shadow-whisper-strong'
+    : 'bg-claude-ivory shadow-ring-brand hover:shadow-whisper';
+
+  // 상단 색띠지(obi) — super는 솔리드 테라코타, special은 엷은 테라코타
+  const bandCls = isSuper
+    ? 'bg-primary text-primary-foreground'
+    : 'bg-primary/12 text-primary';
+  const bandSourcePillCls = isSuper
+    ? 'bg-primary-foreground/20 text-primary-foreground'
+    : 'bg-primary/20 text-primary';
+
+  const copyBeforeBtnCls = 'bg-claude-sand text-claude-charcoal hover:bg-claude-sand/80 shadow-ring-warm';
+  const copyAfterBtnCls = 'bg-primary text-primary-foreground shadow-ring-brand hover:brightness-95';
+
+  const HoneyTip = ({ tip }: { tip: string }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1 px-2.5 h-8 text-xs rounded-md bg-claude-sand text-claude-charcoal hover:bg-claude-sand/80 shadow-ring-warm transition-colors"
+        >
+          🐝 꿀팁
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 bg-claude-ivory border-claude-border-cream">
+        <div className="space-y-2">
+          <h4 className="font-serif text-sm text-primary flex items-center gap-1">🐝 꿀팁</h4>
+          <p className="text-sm text-claude-olive leading-relaxed whitespace-pre-wrap">{tip}</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
+  const ToolBadge = ({ tool }: { tool: string }) => (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-claude-sand text-claude-charcoal">
+      {tool}
+    </span>
+  );
+
+  const SectionDivider = ({ label }: { label: string }) => (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="text-[10px] uppercase tracking-[0.14em] font-medium text-primary">
+        {label}
+      </span>
+      <div className="flex-1 h-px bg-primary/20" />
+    </div>
+  );
+
+  const renderItem = (
+    item: PromptCardType['beforeItems'][number],
+    copyKind: 'before' | 'after',
+  ) => (
+    <div>
+      {item.tool && (
+        <div className="mb-5 flex flex-wrap gap-1.5">
+          {item.tool.split('/').map((tool, idx) => (
+            <ToolBadge key={idx} tool={tool.trim()} />
+          ))}
+        </div>
+      )}
+      {item.image && (
+        <div className="mb-6 overflow-hidden rounded-xl shadow-ring-warm">
+          <img src={item.image} alt={copyKind} className="w-full block" />
+        </div>
+      )}
+      {item.english && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] uppercase tracking-[0.14em] font-medium text-claude-stone">
+              English
+            </span>
+            <div className="flex items-center gap-1.5">
+              {item.tip && <HoneyTip tip={item.tip} />}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(item.english, `${copyKind}-english`);
+                }}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 h-8 text-xs rounded-md transition-all',
+                  copyKind === 'after' ? copyAfterBtnCls : copyBeforeBtnCls
+                )}
+              >
+                <Copy className="h-3 w-3" />
+                복사
+              </button>
+            </div>
+          </div>
+          <div className="p-4 rounded-xl bg-background text-[13px] font-mono leading-relaxed whitespace-pre-wrap break-words text-claude-charcoal shadow-ring-warm">
+            {renderBoldText(item.english)}
+          </div>
+        </div>
+      )}
+      {item.korean && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] uppercase tracking-[0.14em] font-medium text-claude-stone">
+              한국어
+            </span>
+            <div className="flex items-center gap-1.5">
+              {item.tip && !item.english && <HoneyTip tip={item.tip} />}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(item.korean, `${copyKind}-korean`);
+                }}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 h-8 text-xs rounded-md transition-all',
+                  copyKind === 'after' ? copyAfterBtnCls : copyBeforeBtnCls
+                )}
+              >
+                <Copy className="h-3 w-3" />
+                복사
+              </button>
+            </div>
+          </div>
+          <div className="p-4 rounded-xl bg-background text-sm leading-relaxed whitespace-pre-wrap break-words text-claude-charcoal shadow-ring-warm">
+            {renderBoldText(item.korean)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div className={`group relative rounded-lg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col ${
-            isSuper
-              ? 'bg-gradient-to-br from-amber-50 via-yellow-100/50 to-orange-100/30 dark:from-amber-950/40 dark:via-yellow-900/20 dark:to-orange-900/10 border-2 border-amber-400/60 ring-1 ring-amber-300/40'
-              : 'bg-gradient-to-br from-card via-primary/8 to-primary/12 border-2 border-primary/40 ring-1 ring-primary/20'
-          }`}>
-            {/* 헤더 */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+          <article
+            className={cn(
+              'group relative rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col hover:-translate-y-0.5',
+              surfaceCls
+            )}
+          >
+            {/* 색띠지(obi) — 책 챕터 마커 역할: 프리미엄 시그널 + 챕터 번호 집약 */}
+            <div className={cn('px-6 pt-3.5 pb-4', bandCls)}>
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-2 min-w-0">
                   {isSuper ? (
-                    <Crown className="h-4 w-4 text-amber-500 animate-pulse" />
+                    <Crown className="h-4 w-4 flex-shrink-0" />
                   ) : (
-                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                    <Sparkles className="h-4 w-4 flex-shrink-0" />
                   )}
-                  <h3 className={`text-base font-semibold line-clamp-2 flex flex-wrap items-center ${
-                    isSuper ? 'text-amber-600 dark:text-amber-400' : 'text-primary shimmer-text'
-                  }`}>
-                    {renderTitle(card.title, isSuper)}
-                  </h3>
+                  <span className="text-[11px] uppercase tracking-[0.16em] font-bold">
+                    {isSuper ? 'Super Prompt' : 'Special Prompt'}
+                  </span>
+                  {sourceBadge && (
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0',
+                        bandSourcePillCls
+                      )}
+                    >
+                      {sourceBadge}
+                    </span>
+                  )}
                 </div>
               </div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold shrink-0 shadow-sm ${
-                      isSuper
-                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/40'
-                        : 'bg-primary/15 text-primary border border-primary/30'
-                    }`}>
-                      <span>{getScoreText(clickCount)}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">{clickCount}명이 사용했어요!</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {prefix && (
+                <div className="text-lg font-bold whitespace-nowrap">{prefix}</div>
+              )}
             </div>
 
-            {/* Before 섹션 */}
-            {card.beforeItems.length > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-medium text-foreground">Before</span>
-                  <div className="flex-1 h-px bg-border/60"></div>
-                </div>
-                <div className="space-y-4">
-                  {card.beforeItems.map((item, index) => (
-                    <div key={item.id} className={index > 0 ? 'pt-3 border-t border-border/30' : ''}>
-                      {/* Before 도구 배지 */}
-                      {item.tool && (
-                        <div className="mb-2 flex flex-wrap gap-2">
-                          {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium shadow-sm ${
-                              isSuper
-                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/30'
-                                : 'bg-primary/10 text-primary border border-primary/25'
-                            }`}>
-                              {tool.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {/* Before 이미지 */}
-                      {item.image && (
-                        <div className="mb-3">
-                          <img
-                            src={item.image}
-                            alt="Before"
-                            className={`w-full rounded-lg shadow-sm ${
-                              isSuper
-                                ? 'border border-amber-400/30'
-                                : 'border border-primary/30'
-                            }`}
-                          />
-                        </div>
-                      )}
-                      {item.english && (
-                        <div className="mb-3">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-muted-foreground">English</span>
-                            <div className="flex items-center gap-2">
-                              {item.tip && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <button
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
-                                    >
-                                      🐝 꿀팁
-                                    </button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopy(item.english, 'before-english');
-                                }}
-                                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
-                                  isSuper
-                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
-                                    : 'bg-primary/15 text-primary hover:bg-primary/25'
-                                }`}
-                              >
-                                <Copy className="h-3 w-3" />
-                                복사
-                              </button>
-                            </div>
-                          </div>
-                          <div className={`p-3 rounded-md text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm ${
-                            isSuper
-                              ? 'border border-amber-400/20 bg-amber-500/8'
-                              : 'border border-primary/20 bg-primary/8'
-                          }`}>
-                            {renderBoldText(item.english)}
-                          </div>
-                        </div>
-                      )}
-                      {item.korean && (
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-muted-foreground">한국어</span>
-                            <div className="flex items-center gap-2">
-                              {item.tip && !item.english && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <button
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
-                                    >
-                                      🐝 꿀팁
-                                    </button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopy(item.korean, 'before-korean');
-                                }}
-                                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
-                                  isSuper
-                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
-                                    : 'bg-primary/15 text-primary hover:bg-primary/25'
-                                }`}
-                              >
-                                <Copy className="h-3 w-3" />
-                                복사
-                              </button>
-                            </div>
-                          </div>
-                          <div className={`p-3 rounded-md text-xs whitespace-pre-wrap break-words text-foreground shadow-sm ${
-                            isSuper
-                              ? 'border border-amber-400/20 bg-amber-500/8'
-                              : 'border border-primary/20 bg-primary/8'
-                          }`}>
-                            {renderBoldText(item.korean)}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="p-6">
+              <header className="flex items-start justify-between gap-4 mb-7">
+                <h3 className="font-serif text-[22px] leading-[1.25] text-foreground flex-1 min-w-0">
+                  {rest || card.title}
+                </h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={cn(
+                          'flex items-center gap-1 px-2.5 h-7 rounded-full text-xs font-medium shrink-0',
+                          isSuper
+                            ? 'bg-primary text-primary-foreground shadow-ring-brand'
+                            : 'bg-primary/15 text-primary'
+                        )}
+                      >
+                        <span>{getScoreText(clickCount)}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{clickCount}명이 사용했어요!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </header>
 
-            {/* After 섹션 */}
-            {card.afterItems.length > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-medium text-foreground">After</span>
-                  <div className="flex-1 h-px bg-border/60"></div>
-                </div>
-                <div className="space-y-4">
-                  {card.afterItems.map((item, index) => (
-                    <div key={item.id} className={index > 0 ? 'pt-3 border-t border-border/30' : ''}>
-                      {/* After 도구 배지 */}
-                      {item.tool && (
-                        <div className="mb-2 flex flex-wrap gap-2">
-                          {item.tool.split('/').map((tool, idx) => (
-                            <span key={idx} className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium shadow-sm ${
-                              isSuper
-                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/30'
-                                : 'bg-primary/10 text-primary border border-primary/25'
-                            }`}>
-                              {tool.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {/* After 이미지 */}
-                      {item.image && (
-                        <div className="mb-3">
-                          <img
-                            src={item.image}
-                            alt="After"
-                            className={`w-full rounded-lg shadow-sm ${
-                              isSuper
-                                ? 'border border-amber-400/30'
-                                : 'border border-primary/30'
-                            }`}
-                          />
-                        </div>
-                      )}
-                      {item.english && (
-                        <div className="mb-3">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-muted-foreground">English</span>
-                            <div className="flex items-center gap-2">
-                              {item.tip && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <button
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
-                                    >
-                                      🐝 꿀팁
-                                    </button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopy(item.english, 'after-english');
-                                }}
-                                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
-                                  isSuper
-                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
-                                    : 'bg-primary/15 text-primary hover:bg-primary/25'
-                                }`}
-                              >
-                                <Copy className="h-3 w-3" />
-                                복사
-                              </button>
-                            </div>
-                          </div>
-                          <div className={`p-3 rounded-md text-xs font-mono whitespace-pre-wrap break-words text-foreground shadow-sm ${
-                            isSuper
-                              ? 'border border-amber-400/20 bg-amber-500/8'
-                              : 'border border-primary/20 bg-primary/8'
-                          }`}>
-                            {renderBoldText(item.english)}
-                          </div>
-                        </div>
-                      )}
-                      {item.korean && (
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-muted-foreground">한국어</span>
-                            <div className="flex items-center gap-2">
-                              {item.tip && !item.english && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <button
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
-                                    >
-                                      🐝 꿀팁
-                                    </button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">🐝 꿀팁</h4>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.tip}</p>
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopy(item.korean, 'after-korean');
-                                }}
-                                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-md transition-colors font-medium shadow-sm ${
-                                  isSuper
-                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25'
-                                    : 'bg-primary/15 text-primary hover:bg-primary/25'
-                                }`}
-                              >
-                                <Copy className="h-3 w-3" />
-                                복사
-                              </button>
-                            </div>
-                          </div>
-                          <div className={`p-3 rounded-md text-xs whitespace-pre-wrap break-words text-foreground shadow-sm ${
-                            isSuper
-                              ? 'border border-amber-400/20 bg-amber-500/8'
-                              : 'border border-primary/20 bg-primary/8'
-                          }`}>
-                            {renderBoldText(item.korean)}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              {card.beforeItems.length > 0 && (
+                <section className="mb-8">
+                  <SectionDivider label="Before" />
+                  <div className="space-y-7">
+                    {card.beforeItems.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className={index > 0 ? 'pt-7 border-t border-claude-border-cream' : ''}
+                      >
+                        {renderItem(item, 'before')}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            {/* 푸터 */}
-            <div className={`pt-4 flex items-center justify-end mt-4 ${
-              isSuper ? 'border-t border-amber-400/20' : 'border-t border-primary/20'
-            }`}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCommentModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-primary/10 font-medium min-h-[36px]"
-              >
-                <MessageSquare className="h-3.5 w-3.5" />
-                댓글
-              </button>
+              {card.afterItems.length > 0 && (
+                <section className="mb-4">
+                  <SectionDivider label="After" />
+                  <div className="space-y-7">
+                    {card.afterItems.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className={index > 0 ? 'pt-7 border-t border-claude-border-cream' : ''}
+                      >
+                        {renderItem(item, 'after')}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <footer className="pt-5 mt-7 border-t border-claude-border-cream flex items-center justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCommentModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 h-9 text-xs rounded-lg text-claude-olive hover:text-foreground hover:bg-claude-sand/70 transition-colors"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  댓글
+                </button>
+              </footer>
             </div>
-          </div>
+          </article>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => setCommentModalOpen(true)}>
@@ -467,4 +354,3 @@ export function SpecialPromptCard({ card, isSuper = false }: SpecialPromptCardPr
     </>
   );
 }
-

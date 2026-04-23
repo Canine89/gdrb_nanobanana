@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PaginationProps {
   currentPage: number;
@@ -13,19 +14,18 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-6 sm:mt-8">
+    <div className="flex items-center justify-center gap-1.5">
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="min-h-[44px] px-4"
+        className="h-9 px-3"
       >
         <ChevronLeft className="h-4 w-4" />
-        <span className="hidden sm:inline ml-1">이전</span>
+        <span className="hidden sm:inline ml-0.5">이전</span>
       </Button>
 
-      {/* 데스크톱: 페이지 번호 표시 */}
       <div className="hidden sm:flex items-center gap-1">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
           if (
@@ -33,40 +33,42 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
             page === totalPages ||
             (page >= currentPage - 1 && page <= currentPage + 1)
           ) {
+            const isActive = currentPage === page;
             return (
-              <Button
+              <button
                 key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
                 onClick={() => onPageChange(page)}
-                className="min-w-[40px]"
+                className={cn(
+                  'inline-flex items-center justify-center min-w-[36px] h-9 px-2.5 rounded-md text-sm font-medium transition-all',
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-ring-brand'
+                    : 'bg-transparent text-claude-olive hover:bg-claude-sand/70 hover:text-foreground'
+                )}
               >
                 {page}
-              </Button>
+              </button>
             );
           } else if (page === currentPage - 2 || page === currentPage + 2) {
-            return <span key={page} className="px-2">...</span>;
+            return <span key={page} className="px-1 text-claude-stone">…</span>;
           }
           return null;
         })}
       </div>
 
-      {/* 모바일: 현재 페이지 표시 */}
-      <div className="sm:hidden px-3 py-2 bg-muted rounded-md text-sm font-medium">
+      <div className="sm:hidden px-3 h-9 inline-flex items-center bg-claude-sand rounded-md text-sm font-medium text-claude-charcoal">
         {currentPage} / {totalPages}
       </div>
 
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="min-h-[44px] px-4"
+        className="h-9 px-3"
       >
-        <span className="hidden sm:inline mr-1">다음</span>
+        <span className="hidden sm:inline mr-0.5">다음</span>
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
   );
 }
-

@@ -19,47 +19,77 @@ const config = {
     },
     extend: {
       fontFamily: {
-        'noto-sans-kr': ['var(--font-noto-sans-kr)', 'sans-serif'],
+        sans: ['var(--font-sans)'],
+        serif: ['var(--font-serif)'],
+        mono: ['var(--font-mono)'],
       },
       colors: {
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "var(--destructive)",
-          foreground: "var(--destructive-foreground)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        // Claude Design System — direct access for explicit use
+        claude: {
+          parchment: "hsl(var(--parchment))",
+          ivory: "hsl(var(--ivory))",
+          sand: "hsl(var(--warm-sand))",
+          'border-cream': "hsl(var(--border-cream))",
+          'ring-warm': "hsl(var(--ring-warm))",
+          'ring-deep': "hsl(var(--ring-deep))",
+          black: "hsl(var(--near-black))",
+          'dark-surface': "hsl(var(--dark-surface))",
+          charcoal: "hsl(var(--charcoal-warm))",
+          olive: "hsl(var(--olive-gray))",
+          stone: "hsl(var(--stone-gray))",
+          silver: "hsl(var(--warm-silver))",
+          terracotta: "hsl(var(--terracotta))",
+          coral: "hsl(var(--coral))",
+          crimson: "hsl(var(--error-crimson))",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "4px",
+        md: "8px",
+        lg: "12px",
+        xl: "16px",
+        '2xl': "24px",
+        '3xl': "32px",
+      },
+      boxShadow: {
+        'ring-warm': "0 0 0 1px hsl(var(--ring-warm))",
+        'ring-deep': "0 0 0 1px hsl(var(--ring-deep))",
+        'ring-brand': "0 0 0 1px hsl(var(--terracotta))",
+        whisper: "0 4px 24px rgba(0, 0, 0, 0.05)",
+        'whisper-strong': "0 8px 32px rgba(0, 0, 0, 0.06)",
       },
       keyframes: {
         "accordion-down": {
@@ -81,4 +111,3 @@ const config = {
 } satisfies Config
 
 export default config
-
