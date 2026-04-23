@@ -23,7 +23,8 @@ import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PromptCard as PromptCardType, PromptStats } from '@/types';
-import { MessageSquare, Copy } from 'lucide-react';
+import { MessageSquare, Copy, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PromptCardProps {
   card: PromptCardType;
@@ -32,6 +33,14 @@ interface PromptCardProps {
 function getScoreText(clickCount: number): string {
   if (clickCount === 0) return '0';
   return clickCount.toString();
+}
+
+function parseTitle(title: string): { prefix: string | null; rest: string } {
+  const match = title.match(/^((?:미친 활용|스페셜 프롬프트)\s*\d+)\s*(.*)$/);
+  if (match) {
+    return { prefix: match[1], rest: match[2].trim() };
+  }
+  return { prefix: null, rest: title };
 }
 
 function renderBoldText(text: string): React.ReactNode {
@@ -55,27 +64,9 @@ function renderBoldText(text: string): React.ReactNode {
   return parts.length > 0 ? <>{parts}</> : text;
 }
 
-function renderTitle(title: string): React.ReactNode {
-  const match = title.match(/^((?:미친 활용|스페셜 프롬프트)\s*\d+)\s*(.*)$/);
-
-  if (match) {
-    const [, prefix, rest] = match;
-    return (
-      <>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-sans font-medium uppercase tracking-[0.12em] mr-2 bg-claude-sand text-claude-charcoal">
-          {prefix}
-        </span>
-        <span>{rest}</span>
-      </>
-    );
-  }
-
-  return title;
-}
-
 function SectionDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 mb-4">
+    <div className="flex items-center gap-3 mb-5">
       <span className="text-[10px] uppercase tracking-[0.14em] font-medium text-claude-stone">
         {label}
       </span>
@@ -141,6 +132,7 @@ export function PromptCard({ card }: PromptCardProps) {
   };
 
   const clickCount = stats?.clickCount || 0;
+  const { prefix, rest } = parseTitle(card.title);
 
   const renderItem = (
     item: PromptCardType['beforeItems'][number],
@@ -148,19 +140,19 @@ export function PromptCard({ card }: PromptCardProps) {
   ) => (
     <div>
       {item.tool && (
-        <div className="mb-4 flex flex-wrap gap-1.5">
+        <div className="mb-5 flex flex-wrap gap-1.5">
           {item.tool.split('/').map((tool, idx) => (
             <ToolBadge key={idx} tool={tool.trim()} />
           ))}
         </div>
       )}
       {item.image && (
-        <div className="mb-5 overflow-hidden rounded-xl shadow-ring-warm">
+        <div className="mb-6 overflow-hidden rounded-xl shadow-ring-warm">
           <img src={item.image} alt={copyKind} className="w-full block" />
         </div>
       )}
       {item.english && (
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] uppercase tracking-[0.14em] font-medium text-claude-stone">
               English
@@ -224,64 +216,78 @@ export function PromptCard({ card }: PromptCardProps) {
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <article className="group relative bg-claude-ivory rounded-2xl p-6 shadow-ring-warm hover:shadow-whisper hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col">
-            {/* Header */}
-            <header className="flex items-start justify-between gap-4 mb-6">
-              <h3 className="font-serif text-[20px] leading-[1.25] text-foreground flex-1 flex flex-wrap items-center">
-                {renderTitle(card.title)}
-              </h3>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 px-2.5 h-7 rounded-full bg-claude-sand text-claude-charcoal text-xs font-medium shrink-0 shadow-ring-warm">
-                      <span>{getScoreText(clickCount)}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">{clickCount}명이 사용했어요!</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </header>
+          <article className="group relative bg-claude-ivory rounded-2xl overflow-hidden shadow-ring-warm hover:shadow-whisper hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col">
+            {/* 색띠지(obi) — 엷은 톤으로 Special Prompt + 챕터 번호 집약 */}
+            <div className="px-6 pt-3.5 pb-4 bg-primary/12 text-primary">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Sparkles className="h-4 w-4 flex-shrink-0" />
+                <span className="text-[11px] uppercase tracking-[0.16em] font-bold">
+                  Special Prompt
+                </span>
+              </div>
+              {prefix && (
+                <div className="text-lg font-bold whitespace-nowrap">{prefix}</div>
+              )}
+            </div>
 
-            {card.beforeItems.length > 0 && (
-              <section className="mb-7">
-                <SectionDivider label="Before" />
-                <div className="space-y-6">
-                  {card.beforeItems.map((item, index) => (
-                    <div key={item.id} className={index > 0 ? 'pt-6 border-t border-claude-border-cream' : ''}>
-                      {renderItem(item, 'before')}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <div className="p-6">
+              <header className="flex items-start justify-between gap-4 mb-7">
+                <h3 className="font-serif text-[20px] leading-[1.3] text-foreground flex-1 min-w-0">
+                  {rest || card.title}
+                </h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 px-2.5 h-7 rounded-full bg-primary/15 text-primary text-xs font-medium shrink-0">
+                        <span>{getScoreText(clickCount)}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{clickCount}명이 사용했어요!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </header>
 
-            {card.afterItems.length > 0 && (
-              <section className="mb-3">
-                <SectionDivider label="After" />
-                <div className="space-y-6">
-                  {card.afterItems.map((item, index) => (
-                    <div key={item.id} className={index > 0 ? 'pt-6 border-t border-claude-border-cream' : ''}>
-                      {renderItem(item, 'after')}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+              {card.beforeItems.length > 0 && (
+                <section className="mb-8">
+                  <SectionDivider label="Before" />
+                  <div className="space-y-7">
+                    {card.beforeItems.map((item, index) => (
+                      <div key={item.id} className={index > 0 ? 'pt-7 border-t border-claude-border-cream' : ''}>
+                        {renderItem(item, 'before')}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            <footer className="pt-5 mt-6 border-t border-claude-border-cream flex items-center justify-end">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCommentModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-3 h-9 text-xs rounded-lg text-claude-olive hover:text-foreground hover:bg-claude-sand/70 transition-colors"
-              >
-                <MessageSquare className="h-3.5 w-3.5" />
-                댓글
-              </button>
-            </footer>
+              {card.afterItems.length > 0 && (
+                <section className="mb-4">
+                  <SectionDivider label="After" />
+                  <div className="space-y-7">
+                    {card.afterItems.map((item, index) => (
+                      <div key={item.id} className={index > 0 ? 'pt-7 border-t border-claude-border-cream' : ''}>
+                        {renderItem(item, 'after')}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <footer className="pt-5 mt-7 border-t border-claude-border-cream flex items-center justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCommentModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 h-9 text-xs rounded-lg text-claude-olive hover:text-foreground hover:bg-claude-sand/70 transition-colors"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  댓글
+                </button>
+              </footer>
+            </div>
           </article>
         </ContextMenuTrigger>
         <ContextMenuContent>
