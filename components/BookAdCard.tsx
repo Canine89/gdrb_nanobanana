@@ -9,15 +9,17 @@ interface BookAdCardProps {
   className?: string;
 }
 
-const BOOK_URL = 'https://www.yes24.com/product/goods/167400825';
-const BOOK_TITLE_LINE_1 = '나노바나나 AI 비포&애프터';
-const BOOK_TITLE_LINE_2 = '미친 활용법 71제';
+const BOOK_URL = 'https://www.yes24.com/product/goods/188600611';
+const KAKAO_URL = 'https://open.kakao.com/o/gGiRtK5h';
+const BOOK_TITLE_LINE_1 = '이게 되네? 나노바나나 2';
+const BOOK_TITLE_LINE_2 = 'AI 비포&애프터 미친 활용법 82제';
 const BOOK_TITLE = `${BOOK_TITLE_LINE_1} ${BOOK_TITLE_LINE_2}`;
-const BOOK_SUBTITLE = '클릭 몇 번으로 이렇게 달라진다고! 쌩초의 비포/애프터 레시피 대방출!';
-const BOOK_COVER = '/nanobanana_cover_3d.png';
+const BOOK_SUBTITLE = '포토샵 없이 제미나이로 5초 컷! 프리픽, 씨드림, 미드저니까지 한 권으로 끝내기';
+const BOOK_COVER = '/nanobanana2_cover.jpg';
 
 export function BookAdCard({ variant, className }: BookAdCardProps) {
   const openBookLink = () => window.open(BOOK_URL, '_blank');
+  const openKakaoLink = () => window.open(KAKAO_URL, '_blank');
 
   const baseSurface =
     'bg-claude-ivory rounded-2xl shadow-ring-warm hover:shadow-whisper transition-shadow duration-300';
@@ -26,7 +28,7 @@ export function BookAdCard({ variant, className }: BookAdCardProps) {
     return (
       <div className={cn(baseSurface, 'p-5 flex flex-col items-center text-center', className)}>
         <p className="text-[10px] uppercase tracking-[0.14em] text-claude-stone font-medium mb-4">
-          원작 도서
+          개정 도서
         </p>
         <div className="relative mb-5">
           <Image
@@ -45,14 +47,24 @@ export function BookAdCard({ variant, className }: BookAdCardProps) {
         <p className="text-xs text-claude-olive leading-relaxed mb-5">
           {BOOK_SUBTITLE}
         </p>
-        <Button
-          size="sm"
-          variant="default"
-          className="w-full"
-          onClick={openBookLink}
-        >
-          도서 구매
-        </Button>
+        <div className="w-full space-y-2">
+          <Button
+            size="sm"
+            variant="default"
+            className="w-full"
+            onClick={openBookLink}
+          >
+            도서 구매
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="w-full"
+            onClick={openKakaoLink}
+          >
+            카톡방
+          </Button>
+        </div>
       </div>
     );
   }
@@ -79,14 +91,22 @@ export function BookAdCard({ variant, className }: BookAdCardProps) {
             {BOOK_SUBTITLE}
           </p>
         </div>
-        <Button
-          size="sm"
-          variant="default"
-          className="flex-shrink-0"
-          onClick={openBookLink}
-        >
-          도서 구매
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={openBookLink}
+          >
+            도서 구매
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={openKakaoLink}
+          >
+            카톡방
+          </Button>
+        </div>
       </div>
     </div>
   );

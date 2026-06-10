@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "나노바나나 AI 슈퍼 프롬프트",
-  description: "나노바나나 AI 비포&애프터 미친 활용법 71제 슈퍼 프롬프트 복붙 시트",
+  description: "이게 되네? 나노바나나 2 AI 비포&애프터 미친 활용법 82제 슈퍼 프롬프트 복붙 시트",
   icons: {
     icon: '/icon.png',
   },
