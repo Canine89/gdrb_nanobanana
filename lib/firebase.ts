@@ -1,5 +1,4 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 
 // 환경 변수를 모듈 레벨에서 상수로 추출 (빌드 타임에 번들에 포함됨)
@@ -34,7 +33,6 @@ function validateFirebaseConfig(): { isValid: boolean; missingVars: string[] } {
 }
 
 let app: FirebaseApp | undefined;
-let auth: Auth | undefined;
 let db: Firestore | undefined;
 
 // Lazy initialization function
@@ -77,9 +75,8 @@ function initializeFirebase() {
     } else {
       app = getApps()[0];
     }
-    auth = getAuth(app);
     db = getFirestore(app);
-    return { app, auth, db };
+    return { app, db };
   } catch (error) {
     console.error('Error initializing Firebase:', error);
     console.error('Firebase config (without sensitive values):', {
@@ -98,5 +95,4 @@ function initializeFirebase() {
 export { initializeFirebase };
 
 // 현재 인스턴스 export (호환성을 위해)
-export { app, auth, db };
-
+export { app, db };

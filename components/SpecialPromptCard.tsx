@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/popover';
 import { CommentModal } from './CommentModal';
 import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PromptCard as PromptCardType, PromptStats } from '@/types';
 import { MessageSquare, Copy, Sparkles, Crown } from 'lucide-react';
@@ -73,7 +72,6 @@ function renderBoldText(text: string): React.ReactNode {
 export function SpecialPromptCard({ card, isSuper = false, sourceBadge }: SpecialPromptCardProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
-  const { userId } = useAuth();
 
   useEffect(() => {
     const unsubscribe = subscribeToPromptStats(card.id, (updatedStats) => {
@@ -83,14 +81,13 @@ export function SpecialPromptCard({ card, isSuper = false, sourceBadge }: Specia
   }, [card.id]);
 
   const handleCopy = async (text: string, type: string) => {
-    if (!userId) {
-      toast.error('인증 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
     try {
       await navigator.clipboard.writeText(text);
       toast.success(`${type}가 클립보드에 복사되었습니다!`);
-      await recordClick(card.id, userId);
+
+      recordClick(card.id).catch((error) => {
+        console.error('Error recording click:', error);
+      });
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       toast.error('복사에 실패했습니다.');

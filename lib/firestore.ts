@@ -15,8 +15,28 @@ import {
 import { initializeFirebase } from './firebase';
 import type { ClickEvent, Comment, PromptStats } from '@/types';
 
+function getAnonymousClientId() {
+  if (typeof window === 'undefined') {
+    return 'server';
+  }
+
+  const storageKey = 'anonymousClientId';
+  const existing = localStorage.getItem(storageKey);
+  if (existing) {
+    return existing;
+  }
+
+  const clientId =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  localStorage.setItem(storageKey, clientId);
+  return clientId;
+}
+
 // 클릭 이벤트 기록
-export async function recordClick(promptId: string, userId: string) {
+export async function recordClick(promptId: string) {
   const firebaseInstance = initializeFirebase();
   const db = firebaseInstance?.db;
 
@@ -28,7 +48,7 @@ export async function recordClick(promptId: string, userId: string) {
     // 클릭 이벤트 추가
     await addDoc(collection(db, 'clicks'), {
       promptId,
-      userId,
+      userId: getAnonymousClientId(),
       timestamp: serverTimestamp(),
     });
 
@@ -53,7 +73,7 @@ export async function recordClick(promptId: string, userId: string) {
 }
 
 // 댓글 추가
-export async function addComment(promptId: string, userId: string, content: string) {
+export async function addComment(promptId: string, content: string) {
   const firebaseInstance = initializeFirebase();
   const db = firebaseInstance?.db;
 
@@ -64,7 +84,7 @@ export async function addComment(promptId: string, userId: string, content: stri
   try {
     await addDoc(collection(db, 'comments'), {
       promptId,
-      userId,
+      userId: getAnonymousClientId(),
       content,
       timestamp: serverTimestamp(),
     });
@@ -218,4 +238,3 @@ export function subscribeToComments(
     }
   );
 }
-

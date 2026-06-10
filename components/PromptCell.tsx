@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/context-menu';
 import { CommentModal } from './CommentModal';
 import { recordClick, subscribeToPromptStats } from '@/lib/firestore';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Prompt, PromptStats } from '@/types';
 import { MessageSquare } from 'lucide-react';
@@ -40,7 +39,6 @@ function getScoreText(clickCount: number): string {
 export function PromptCell({ prompt }: PromptCellProps) {
   const [stats, setStats] = useState<PromptStats | null>(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
-  const { userId } = useAuth();
 
   useEffect(() => {
     const unsubscribe = subscribeToPromptStats(prompt.id, (updatedStats) => {
@@ -51,18 +49,15 @@ export function PromptCell({ prompt }: PromptCellProps) {
   }, [prompt.id]);
 
   const handleClick = async () => {
-    if (!userId) {
-      toast.error('인증 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-
     try {
       // 클립보드에 복사
       await navigator.clipboard.writeText(prompt.content);
       toast.success('클립보드에 복사되었습니다!');
       
       // 클릭 이벤트 기록
-      await recordClick(prompt.id, userId);
+      recordClick(prompt.id).catch((error) => {
+        console.error('Error recording click:', error);
+      });
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       toast.error('복사에 실패했습니다.');
@@ -109,4 +104,3 @@ export function PromptCell({ prompt }: PromptCellProps) {
     </>
   );
 }
-

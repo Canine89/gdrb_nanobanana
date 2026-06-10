@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { addComment, subscribeToComments } from '@/lib/firestore';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Comment } from '@/types';
 import { MessageSquare, Send } from 'lucide-react';
@@ -26,7 +25,6 @@ export function CommentModal({ promptId, open, onOpenChange }: CommentModalProps
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const { userId } = useAuth();
 
   useEffect(() => {
     if (!open || !promptId) return;
@@ -40,11 +38,11 @@ export function CommentModal({ promptId, open, onOpenChange }: CommentModalProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !userId) return;
+    if (!newComment.trim()) return;
 
     setLoading(true);
     try {
-      await addComment(promptId, userId, newComment.trim());
+      await addComment(promptId, newComment.trim());
       setNewComment('');
       toast.success('댓글이 등록되었습니다!');
     } catch (error) {
@@ -97,10 +95,10 @@ export function CommentModal({ promptId, open, onOpenChange }: CommentModalProps
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="댓글을 입력하세요..."
-              disabled={loading || !userId}
+              disabled={loading}
               className="flex-1 h-11"
             />
-            <Button type="submit" size="icon" className="h-11 w-11" disabled={loading || !userId || !newComment.trim()}>
+            <Button type="submit" size="icon" className="h-11 w-11" disabled={loading || !newComment.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </form>
